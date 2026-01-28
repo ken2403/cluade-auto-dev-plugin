@@ -1,0 +1,18 @@
+{
+  "name": "claude-auto-dev-plugin",
+  "owner": {
+    "name": "ken2403"
+  },
+  "metadata": {
+    "description": "Autonomous hierarchical multi-agent development plugin",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "ad",
+      "source": "./",
+      "description": "Auto Dev - Autonomous hierarchical multi-agent development system",
+      "version": "0.1.0"
+    }
+  ]
+}
