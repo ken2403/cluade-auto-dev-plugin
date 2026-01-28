@@ -77,29 +77,27 @@ cat > .auto-dev/sessions/$SESSION_ID/session.json << EOF
 EOF
 ```
 
-### Step 4: タイトル生成（AI要約）
-
-```bash
-# Generate title and strip ANSI escape codes / whitespace
-RAW_TITLE=$(claude -p "You are a title generator. Output ONLY a short task title in 3-5 words. No quotes, no period, no explanation. Just the title. Instruction: $INSTRUCTION" 2>/dev/null || echo "")
-TITLE=$(echo "$RAW_TITLE" | sed 's/\x1b\[[0-9;]*m//g' | tr -d '\r' | sed '/^$/d' | tail -1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-if [[ -n "$TITLE" ]]; then
-  echo "$TITLE" > .auto-dev/sessions/$SESSION_ID/title.txt
-fi
-```
-
-### Step 5: tmux Windowの作成
+### Step 4: tmux Windowの作成
 
 ```bash
 WINDOW_NUM=$(bash "$AD_PLUGIN_DIR/scripts/dashboard.sh" ad_new_window "$SESSION_ID" "$INSTRUCTION")
 ```
 
-### Step 6: CEOの起動（新しいWindowのpane 0で実行）
+### Step 5: CEOの起動（新しいWindowのpane 0で実行）
 
 ```bash
 bash "$AD_PLUGIN_DIR/scripts/spinup.sh" "$SESSION_ID" ceo \
   "Instruction from God: $INSTRUCTION. Working directory: .auto-dev/sessions/$SESSION_ID/" \
   --initial
+```
+
+### Step 6: タイトル生成（必ずバックグラウンドで実行）
+
+**絶対に `&` を付けてバックグラウンド実行すること。同期実行してはならない。**
+タイトル完成後、自動的に `title.txt` に保存され tmux window 名が更新される。
+
+```bash
+bash "$AD_PLUGIN_DIR/scripts/gen-title.sh" "$SESSION_ID" "$INSTRUCTION" &
 ```
 
 ### Step 7: ユーザーへの報告（これで完了。他に何もしない）

@@ -187,16 +187,19 @@ main() {
     # Generate launcher script to properly load role file contents
     # --system-prompt takes a STRING, not a file path.
     # The launcher reads the role file at runtime and passes contents as system prompt.
+    # Launches in interactive mode so the agent is visible and responsive in the pane.
     local launcher="$log_dir/.launcher-${pane_name}.sh"
     cat > "$launcher" << LAUNCHER_EOF
 #!/bin/bash
 ROLE_FILE="$role_file"
 ROLE_CONTENT=\$(cat "\$ROLE_FILE")
-exec $claude_bin --system-prompt "\$ROLE_CONTENT" -p '$escaped_task.
-Working directory: $SESSIONS_DIR/$session_id/
-Report to: $SESSIONS_DIR/$session_id/blackboard/${pane_name}.json'
+exec $claude_bin --dangerously-skip-permissions --system-prompt "\$ROLE_CONTENT"
 LAUNCHER_EOF
     chmod +x "$launcher"
+
+    # Initial prompt to send after interactive claude starts (must be single line
+    # because tmux send-keys interprets newlines as Enter keystrokes)
+    local initial_prompt="${escaped_task}. Working directory: $SESSIONS_DIR/$session_id/ | Report to: $SESSIONS_DIR/$session_id/blackboard/${pane_name}.json"
 
     local cmd="bash '$launcher'"
 
@@ -212,6 +215,16 @@ LAUNCHER_EOF
         tmux split-window $split_flag -t "$target" "$cmd"
         new_pane=$(tmux list-panes -t "$SESSION_NAME:$window" -F '#{pane_index}' | tail -1)
     fi
+
+    # Wait for claude CLI to start, then send the initial prompt
+    # -l sends text literally (prevents tmux from interpreting special chars as key names)
+    # Enter must be sent separately without -l so tmux interprets it as the Enter key
+    (
+        sleep 5
+        tmux send-keys -l -t "$SESSION_NAME:$window.$new_pane" "$initial_prompt"
+        sleep 0.2
+        tmux send-keys -t "$SESSION_NAME:$window.$new_pane" Enter
+    ) &
 
     # Set pane title
     tmux select-pane -t "$SESSION_NAME:$window.$new_pane" -T "$pane_name"
