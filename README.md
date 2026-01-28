@@ -18,46 +18,53 @@ PM  UX  Dev (調査・実装)
 
 ## 必要要件
 
-- **Claude Code CLI** (claude コマンドが使える状態)
+- **Claude Code CLI** (`claude` コマンドが使える状態)
 - **tmux** (マルチペイン管理用)
 - **macOS** (通知機能用。Linux でも動作しますが通知は出ません)
 
 ## インストール
 
-### 方法1: Claude Code のプラグインとして使う (推奨)
+### 1. プラグインの配置
+
+GitHubからクローンします。プラグインは**任意のディレクトリ**に配置可能です：
 
 ```bash
-# 1. リポジトリをクローン
+# 任意のディレクトリにクローン
+cd /path/to/any-directory
 git clone https://github.com/ken2403/claude-auto-dev-plugin.git
-
-# 2. 作業したいプロジェクトに移動
-cd your-project-directory
-
-# 3. プラグインを有効化 (シンボリックリンク作成)
-ln -s /path/to/claude-auto-dev-plugin/.claude-plugin .claude-plugin
-
-# 4. CLAUDE.md もリンク (オプション)
-ln -s /path/to/claude-auto-dev-plugin/CLAUDE.md .claude/plugins/auto-dev.md
 ```
 
-### 方法2: プロジェクト内にコピー
+配置例：
+
+```
+/opt/claude-plugins/
+└── claude-auto-dev-plugin/    # このプラグイン
+```
+
+### 2. Claude Code でプラグインを有効化
+
+#### 方法A: Marketplace として登録 (推奨)
+
+プラグインを Marketplace として登録すると、どのプロジェクトでも利用可能になります：
 
 ```bash
-# リポジトリをクローン
-git clone https://github.com/ken2403/claude-auto-dev-plugin.git
+# プラグインを Marketplace として追加
+claude plugin marketplace add /path/to/claude-auto-dev-plugin
 
-# プロジェクトにコピー
-cp -r claude-auto-dev-plugin/.claude-plugin your-project/.claude-plugin
-cp -r claude-auto-dev-plugin/roles your-project/.claude-plugin/roles
-cp -r claude-auto-dev-plugin/agents your-project/.claude-plugin/agents
-cp -r claude-auto-dev-plugin/scripts your-project/.claude-plugin/scripts
-cp -r claude-auto-dev-plugin/commands your-project/.claude-plugin/commands
-cp -r claude-auto-dev-plugin/skills your-project/.claude-plugin/skills
-cp -r claude-auto-dev-plugin/templates your-project/.claude-plugin/templates
-cp -r claude-auto-dev-plugin/hooks your-project/.claude-plugin/hooks
+# プラグインをインストール
+claude plugin install ad@claude-auto-dev-plugin
 ```
 
-### インストール確認
+#### 方法B: 起動時にオプション指定
+
+特定のセッションでのみ使用する場合は、`--plugin-dir` オプションを指定して Claude Code を起動：
+
+```bash
+cd your-project
+claude --plugin-dir /path/to/claude-auto-dev-plugin
+```
+
+### 3. インストール確認
 
 ```bash
 # Claude Code を起動
