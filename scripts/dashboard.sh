@@ -59,11 +59,20 @@ session_exists() {
     load_session_name && tmux has-session -t "$SESSION_NAME" 2>/dev/null
 }
 
+# Attach or switch to session (handles nested tmux)
+attach_session() {
+    if [[ -n "${TMUX:-}" ]]; then
+        tmux switch-client -t "$SESSION_NAME"
+    else
+        tmux attach-session -t "$SESSION_NAME"
+    fi
+}
+
 # Initialize Auto Dev tmux session with Command Center
 ad_init() {
     if session_exists; then
         log_warn "Session '$SESSION_NAME' already exists. Attaching..."
-        tmux attach-session -t "$SESSION_NAME"
+        attach_session
         return
     fi
 
@@ -106,8 +115,8 @@ ad_init() {
     log_success "Auto Dev session created."
     log_info "Window 0: COMMAND-CENTER (left: adwatch, right-top: claude, right-bottom: terminal)"
 
-    # Attach
-    tmux attach-session -t "$SESSION_NAME"
+    # Attach or switch
+    attach_session
 }
 
 # Create a new session window for a task
