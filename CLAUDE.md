@@ -97,7 +97,13 @@ When CEO needs human judgment, you'll receive a **macOS notification**.
 ## tmux Window Layout
 
 ```
-window 0: COMMAND CENTER (always available, run /ad:run here)
+window 0: COMMAND CENTER
+  ┌──────────┬──────────────────┐
+  │          │ Claude CLI (20%) │
+  │ adwatch  ├──────────────────┤
+  │  (40%)   │                  │
+  │          │ Terminal (80%)   │
+  └──────────┴──────────────────┘
 window 1: Session "Auth improvement"
   ┌────────┬────────┬────────┬────────┐
   │  CEO   │VP Prod │VP Dsgn │VP Eng  │

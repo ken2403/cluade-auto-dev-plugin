@@ -39,24 +39,36 @@ ad_init() {
     # Create session with window 0 as Command Center
     tmux new-session -d -s "$SESSION_NAME" -n "COMMAND-CENTER"
 
-    # Set up Command Center layout (split for adwatch on left)
-    tmux split-window -h -t "$SESSION_NAME:0"
-    tmux select-pane -t "$SESSION_NAME:0.0"
-    tmux resize-pane -t "$SESSION_NAME:0.0" -x 30
+    # Set up Command Center layout
+    # Layout: left 40% = adwatch, right top 20% = claude, right bottom 80% = free terminal
+    #
+    # ┌──────────┬─────────────────┐
+    # │          │  Claude (20%)   │
+    # │ adwatch  ├─────────────────┤
+    # │  (40%)   │                 │
+    # │          │ Terminal (80%)  │
+    # │          │                 │
+    # └──────────┴─────────────────┘
 
-    # Run adwatch in left pane
+    # Split horizontally: left (pane 0) | right (pane 1)
+    tmux split-window -h -t "$SESSION_NAME:0"
+    tmux resize-pane -t "$SESSION_NAME:0.0" -p 40
+
+    # Split right pane vertically: top (pane 1) | bottom (pane 2)
+    tmux split-window -v -t "$SESSION_NAME:0.1"
+    tmux resize-pane -t "$SESSION_NAME:0.1" -p 20
+
+    # Pane 0 (left): adwatch
     tmux send-keys -t "$SESSION_NAME:0.0" "bash '$SCRIPT_DIR/adwatch.sh'" Enter
 
-    # Right pane is for claude CLI (Command Center) - auto start Claude
-    tmux select-pane -t "$SESSION_NAME:0.1"
+    # Pane 1 (right top): Claude CLI
     tmux send-keys -t "$SESSION_NAME:0.1" "claude --plugin-dir '$PLUGIN_DIR'" Enter
 
-    # Set hooks for auto-retile on pane split/close
-    tmux set-hook -t "$SESSION_NAME" after-split-window "select-layout tiled"
-    tmux set-hook -t "$SESSION_NAME" pane-exited "select-layout tiled"
+    # Pane 2 (right bottom): free terminal (no command)
+    tmux select-pane -t "$SESSION_NAME:0.2"
 
     log_success "Auto Dev session created."
-    log_info "Window 0: COMMAND-CENTER (adwatch left, claude right)"
+    log_info "Window 0: COMMAND-CENTER (left: adwatch, right-top: claude, right-bottom: terminal)"
 
     # Attach
     tmux attach-session -t "$SESSION_NAME"
