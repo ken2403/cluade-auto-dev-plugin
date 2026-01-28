@@ -1,3 +1,10 @@
+---
+allowed-tools: Read, Bash, Glob
+argument-hint: [SESSION_ID]
+description: Show status of all sessions and agents
+model: haiku
+---
+
 # /ad:status - Auto Dev Status
 
 Show status of all sessions and agents.

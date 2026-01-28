@@ -1,3 +1,10 @@
+---
+allowed-tools: Read, Write, Bash, Glob
+argument-hint: SESSION_ID ["answer"]
+description: Answer an escalation from CEO
+model: haiku
+---
+
 # /ad:ans - Answer Escalation
 
 エスカレーションに回答する。

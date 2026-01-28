@@ -1,3 +1,10 @@
+---
+allowed-tools: Read, Bash, Glob
+argument-hint: [SESSION_ID] [--stale] [--all] [--dry-run]
+description: Clean up completed sessions, worktrees, and tmux windows
+model: haiku
+---
+
 # /ad:cleanup - Auto Dev Cleanup
 
 Clean up completed sessions, worktrees, and tmux windows.

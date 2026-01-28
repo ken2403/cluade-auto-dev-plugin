@@ -1,3 +1,10 @@
+---
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task
+argument-hint: "instruction" or --session ID
+description: Start a new autonomous session or resume an existing one
+model: opus
+---
+
 # /ad:run - Auto Dev Command Center
 
 Start a new autonomous development session or resume an existing one.
