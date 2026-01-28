@@ -47,9 +47,9 @@ ad_init() {
     # Run adwatch in left pane
     tmux send-keys -t "$SESSION_NAME:0.0" "bash '$SCRIPT_DIR/adwatch.sh'" Enter
 
-    # Right pane is for claude CLI (Command Center)
+    # Right pane is for claude CLI (Command Center) - auto start Claude
     tmux select-pane -t "$SESSION_NAME:0.1"
-    tmux send-keys -t "$SESSION_NAME:0.1" "# Auto Dev Command Center - Run /ad:run here" Enter
+    tmux send-keys -t "$SESSION_NAME:0.1" "claude --plugin-dir '$PLUGIN_DIR'" Enter
 
     # Set hooks for auto-retile on pane split/close
     tmux set-hook -t "$SESSION_NAME" after-split-window "select-layout tiled"
