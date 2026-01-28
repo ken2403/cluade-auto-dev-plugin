@@ -85,21 +85,21 @@ ad_init() {
     tmux new-session -d -s "$SESSION_NAME" -n "COMMAND-CENTER"
 
     # Set up Command Center layout
-    # Layout: left 40% = adwatch, right top 80% = claude, right bottom 20% = free terminal
+    # Layout: left 40% = adwatch, right top 85% = claude, right bottom 15% = free terminal
     #
     # ┌──────────┬─────────────────┐
     # │          │                 │
-    # │          │  Claude (80%)   │
-    # │ adwatch  │                 │
+    # │          │  Claude (85%)   │
+    # │ adwatch  │  * active pane  │
     # │  (40%)   ├─────────────────┤
-    # │          │ Terminal (20%)  │
+    # │          │ Terminal (15%)  │
     # └──────────┴─────────────────┘
 
     # Split horizontally: left 40% (pane 0) | right 60% (pane 1)
     tmux split-window -h -l 60% -t "$SESSION_NAME:0"
 
-    # Split right pane vertically: top 80% (pane 1) | bottom 20% (pane 2)
-    tmux split-window -v -l 20% -t "$SESSION_NAME:0.1"
+    # Split right pane vertically: top 85% (pane 1) | bottom 15% (pane 2)
+    tmux split-window -v -l 15% -t "$SESSION_NAME:0.1"
 
     # Pane 0 (left): adwatch
     tmux send-keys -t "$SESSION_NAME:0.0" "bash '$SCRIPT_DIR/adwatch.sh'" Enter
@@ -108,7 +108,8 @@ ad_init() {
     tmux send-keys -t "$SESSION_NAME:0.1" "claude --plugin-dir '$PLUGIN_DIR'" Enter
 
     # Pane 2 (right bottom): free terminal (no command)
-    tmux select-pane -t "$SESSION_NAME:0.2"
+    # Select right top pane (Claude CLI) as the active pane
+    tmux select-pane -t "$SESSION_NAME:0.1"
 
     log_success "Auto Dev session created."
     log_info "Window 0: COMMAND-CENTER (left: adwatch, right-top: claude, right-bottom: terminal)"
