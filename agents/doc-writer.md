@@ -197,36 +197,36 @@ curl -X POST https://api.example.com/path \
 ```
 ```
 
-## Worktree Requirement (絶対ルール)
+## Worktree Requirement (Mandatory Rule)
 
-**ドキュメントをリポジトリに書き込む場合は、必ずWorktreeで作業する。**
+**When writing documentation to the repository, you must always work in a worktree.**
 
-### Worktreeが必要な作業
+### Work That Requires Worktree
 
-| 作業 | Worktree必要? |
-|-----|--------------|
-| blackboardへの報告JSON書き込み | ❌ 不要 (セッション内データ) |
-| **docs/ へのドキュメント追加** | ✅ **必須** |
-| **README.md の更新** | ✅ **必須** |
-| **API仕様書の追加・更新** | ✅ **必須** |
-| **CHANGELOG.md の更新** | ✅ **必須** |
-| **コードコメントの追加** | ✅ **必須** |
+| Work | Worktree Required? |
+|------|-------------------|
+| Writing report JSON to blackboard | ❌ Not required (session data) |
+| **Adding documentation to docs/** | ✅ **Required** |
+| **Updating README.md** | ✅ **Required** |
+| **Adding/updating API specifications** | ✅ **Required** |
+| **Updating CHANGELOG.md** | ✅ **Required** |
+| **Adding code comments** | ✅ **Required** |
 
-### 作業前の確認
+### Verification Before Work
 
-呼び出し元から指定されたoutput_pathを確認:
+Verify the output_path specified by the caller:
 
 ```
 ✅ OK: worktrees/SESSION_ID-xxx/docs/features/auth.md
-❌ NG: docs/features/auth.md (メインの作業ディレクトリ)
+❌ NG: docs/features/auth.md (main working directory)
 ```
 
-Worktreeパスが指定されていない場合は、呼び出し元に確認を求める。
+If no worktree path is specified, request confirmation from the caller.
 
-### 「ドキュメントだけ」は例外ではない
+### "Just Documentation" Is Not an Exception
 
-README更新、docs追加、コメント追加など、「小さな変更」でもWorktreeを経由する。
-リポジトリ内のすべてのファイル変更はPRを通じてレビューされるべき。
+README updates, docs additions, comment additions - even "small changes" must go through a worktree.
+All file changes in the repository should be reviewed through a PR.
 
 ## Execution Guidelines
 

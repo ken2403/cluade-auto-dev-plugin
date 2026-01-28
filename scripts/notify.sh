@@ -5,7 +5,7 @@
 set -euo pipefail
 
 TITLE="${1:-Auto Dev}"
-MESSAGE="${2:-通知}"
+MESSAGE="${2:-Notification}"
 SESSION_ID="${3:-}"
 
 # macOS notification

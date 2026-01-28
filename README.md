@@ -1,352 +1,352 @@
 # Auto Dev Plugin (ad)
 
-曖昧な指示から自律的に開発を進める、階層型マルチエージェントシステム。
+A hierarchical multi-agent system that autonomously develops from vague instructions.
 
-## 概要
+## Overview
 
-「認証を改善して」のような曖昧な指示を投げるだけで、CEO・VP・メンバーという会社組織のようなエージェント群が自律的に動き、仕様策定からPR作成・レビュー対応まで行います。
+Simply give a vague instruction like "improve authentication" and a group of agents organized like a company (CEO, VPs, Members) will autonomously work to handle everything from specification development to PR creation and review handling.
 
 ```
-あなた (God)
-    ↓ 曖昧な指示
-   CEO (指示を解釈・統括)
+You (God)
+    ↓ Vague instruction
+   CEO (Interprets and coordinates)
   / | \
- VP  VP  VP (各部門を統括)
+ VP  VP  VP (Department heads)
  |   |   |
-PM  UX  Dev (調査・実装)
+PM  UX  Dev (Investigation & Implementation)
 ```
 
-## 必要要件
+## Requirements
 
-- **Claude Code CLI** (`claude` コマンドが使える状態)
-- **tmux** (マルチペイン管理用)
-- **macOS** (通知機能用。Linux でも動作しますが通知は出ません)
+- **Claude Code CLI** (`claude` command available)
+- **tmux** (for multi-pane management)
+- **macOS** (for notification features. Works on Linux but notifications won't appear)
 
-## インストール
+## Installation
 
-### 1. プラグインの配置
+### 1. Place the Plugin
 
-GitHubからクローンします。プラグインは**任意のディレクトリ**に配置可能です：
+Clone from GitHub. The plugin can be placed in **any directory**:
 
 ```bash
-# 任意のディレクトリにクローン
+# Clone to any directory
 cd /path/to/any-directory
 git clone https://github.com/ken2403/claude-auto-dev-plugin.git
 ```
 
-配置例：
+Example placement:
 
 ```
 /opt/claude-plugins/
-└── claude-auto-dev-plugin/    # このプラグイン
+└── claude-auto-dev-plugin/    # This plugin
 ```
 
-### 2. Claude Code でプラグインを有効化
+### 2. Enable the Plugin in Claude Code
 
-#### 方法A: Marketplace として登録 (推奨)
+#### Method A: Register as Marketplace (Recommended)
 
-プラグインを Marketplace として登録すると、どのプロジェクトでも利用可能になります：
+Registering the plugin as a Marketplace makes it available in any project:
 
 ```bash
-# プラグインを Marketplace として追加
+# Add plugin as Marketplace
 claude plugin marketplace add /path/to/claude-auto-dev-plugin
 
-# プラグインをインストール
+# Install the plugin
 claude plugin install ad@claude-auto-dev-plugin
 ```
 
-#### 方法B: 起動時にオプション指定
+#### Method B: Specify Option at Startup
 
-特定のセッションでのみ使用する場合は、`--plugin-dir` オプションを指定して Claude Code を起動：
+To use only in a specific session, start Claude Code with the `--plugin-dir` option:
 
 ```bash
 cd your-project
 claude --plugin-dir /path/to/claude-auto-dev-plugin
 ```
 
-### 3. インストール確認
+### 3. Verify Installation
 
 ```bash
-# Claude Code を起動
+# Start Claude Code
 cd your-project-directory
 claude
 
-# プラグインが認識されているか確認
+# Verify the plugin is recognized
 /ad:status
 ```
 
-`/ad:status` が動けばインストール成功です。
+Installation is successful if `/ad:status` works.
 
-## クイックスタート
+## Quick Start
 
-### 1. 初期化 (初回のみ)
+### 1. Initialize (First Time Only)
 
 ```bash
 cd your-project-directory
 bash path/to/claude-auto-dev-plugin/scripts/dashboard.sh ad_init
 ```
 
-tmuxセッション `auto-dev` が起動し、Command Center (window 0) が開きます。
+A tmux session `auto-dev` will start and the Command Center (window 0) will open.
 
-### 2. 指示を投げる
+### 2. Give an Instruction
 
-Command Center で以下を実行:
+Execute the following in the Command Center:
 
 ```bash
-/ad:run "認証機能を改善して"
+/ad:run "Improve the authentication feature"
 ```
 
-これだけで:
-1. 新しいセッションID が生成される
-2. 新しい tmux window が作成される
-3. CEO が起動し、指示を解釈して VP たちを召集
-4. あなたは Command Center に即座に戻り、別の作業が可能
+That's all it takes:
+1. A new session ID is generated
+2. A new tmux window is created
+3. CEO starts, interprets the instruction, and summons VPs
+4. You immediately return to the Command Center and can work on other things
 
-### 3. 進捗確認
+### 3. Check Progress
 
 ```bash
 /ad:status
 ```
 
-全セッションの状態、アクティブなエージェント、進捗を確認できます。
+You can check the status of all sessions, active agents, and progress.
 
-### 4. エスカレーション対応
+### 4. Handle Escalations
 
-CEO が判断を求めてきたら **macOS通知** が届きます。
+When CEO needs your decision, you'll receive a **macOS notification**.
 
 ```bash
-# エスカレーション一覧を確認
+# Check escalation list
 /ad:ans SESSION_ID
 
-# 回答する
-/ad:ans SESSION_ID "TOTPのみでOK。SMSは後回しで。"
+# Respond
+/ad:ans SESSION_ID "TOTP only is fine. SMS can wait."
 ```
 
-### 5. クリーンアップ
+### 5. Cleanup
 
-完了したセッションを削除:
+Delete completed sessions:
 
 ```bash
 /ad:cleanup
 ```
 
-## コマンド一覧
+## Command List
 
-| コマンド | 説明 |
-|---------|------|
-| `/ad:run "指示"` | 新しいセッションを開始 |
-| `/ad:run --session ID` | 既存セッションを再開 |
-| `/ad:run` | 中断セッション一覧から選択して再開 |
-| `/ad:status` | 全セッションの状態を表示 |
-| `/ad:ans SESSION_ID` | エスカレーション一覧を表示 |
-| `/ad:ans SESSION_ID "回答"` | エスカレーションに回答 |
-| `/ad:cleanup` | 完了セッション・worktree を削除 |
+| Command | Description |
+|---------|-------------|
+| `/ad:run "instruction"` | Start a new session |
+| `/ad:run --session ID` | Resume an existing session |
+| `/ad:run` | Select and resume from interrupted sessions list |
+| `/ad:status` | Show status of all sessions |
+| `/ad:ans SESSION_ID` | Show escalation list |
+| `/ad:ans SESSION_ID "answer"` | Respond to an escalation |
+| `/ad:cleanup` | Delete completed sessions and worktrees |
 
-## 使用例
+## Usage Examples
 
-### 例1: 新機能の追加
-
-```bash
-/ad:run "ユーザーにMFA (多要素認証) を追加して"
-```
-
-CEO が自動的に:
-- VP Product に要件調査を依頼
-- VP Design に UX 設計を依頼
-- VP Engineering に技術調査を依頼
-- 統合して仕様書作成
-- QA チームによるレビュー
-- PR 作成
-- Review Sentinel によるレビューコメント自動対応
-
-### 例2: バグ修正
+### Example 1: Adding a New Feature
 
 ```bash
-/ad:run "ログインページで500エラーが出るバグを修正して"
+/ad:run "Add MFA (multi-factor authentication) for users"
 ```
 
-CEO が判断して:
-- VP Engineering だけを召集 (軽微な修正と判断)
-- 技術調査 → 修正 → QA → PR
+CEO automatically:
+- Requests requirements investigation from VP Product
+- Requests UX design from VP Design
+- Requests technical investigation from VP Engineering
+- Integrates and creates specification documents
+- Review by QA team
+- Creates PR
+- Review Sentinel handles review comments automatically
 
-### 例3: 調査のみ
+### Example 2: Bug Fix
 
 ```bash
-/ad:run "現在の認証フローを調査してまとめて"
+/ad:run "Fix the bug causing 500 error on the login page"
 ```
 
-CEO が判断して:
-- 必要な VP を召集
-- 調査結果をまとめて報告
-- 実装は行わない
+CEO decides:
+- Summons only VP Engineering (judged as a minor fix)
+- Technical investigation → Fix → QA → PR
 
-## tmux ウィンドウ構成
+### Example 3: Investigation Only
+
+```bash
+/ad:run "Investigate and summarize the current authentication flow"
+```
+
+CEO decides:
+- Summons necessary VPs
+- Compiles and reports investigation results
+- Does not perform implementation
+
+## tmux Window Structure
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ window 0: COMMAND CENTER                                │
-│  ここで /ad:run を叩く。常に受付可能。                   │
+│  Run /ad:run here. Always available for input.          │
 └─────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────┐
-│ window 1: Session "認証改善" (session_id: abc123)       │
-│ ┌────────┬────────┬────────┬────────┐                  │
-│ │  CEO   │VP Prod │VP Dsgn │VP Eng  │                  │
-│ │        ├────────┼────────┤        │                  │
-│ │        │ PM-1   │  UX    │ Dev-1  │                  │
-│ │        │ PM-2   │  IA    │ Dev-2  │                  │
-│ └────────┴────────┴────────┴────────┘                  │
+│ window 1: Session "Auth Improvement" (session_id: abc123)│
+│ ┌────────┬────────┬────────┬────────┐                   │
+│ │  CEO   │VP Prod │VP Dsgn │VP Eng  │                   │
+│ │        ├────────┼────────┤        │                   │
+│ │        │ PM-1   │  UX    │ Dev-1  │                   │
+│ │        │ PM-2   │  IA    │ Dev-2  │                   │
+│ └────────┴────────┴────────┴────────┘                   │
 └─────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────┐
-│ window 2: Session "バグ修正" (session_id: def456)       │
-│ ┌────────┬────────┐                                    │
-│ │  CEO   │Builder │  ← 軽微修正は CEO が直接 Builder 起動│
-│ └────────┴────────┘                                    │
+│ window 2: Session "Bug Fix" (session_id: def456)        │
+│ ┌────────┬────────┐                                     │
+│ │  CEO   │Builder │  ← For minor fixes, CEO directly    │
+│ └────────┴────────┘    starts Builder                   │
 └─────────────────────────────────────────────────────────┘
 ```
 
-## エスカレーション
+## Escalation
 
-CEO は以下の場合のみ人間に判断を求めます:
+CEO only asks humans for decisions in the following cases:
 
-| 状況 | 例 |
-|------|-----|
-| 指示が曖昧すぎる | 「良くして」だけでは方向性が不明 |
-| VP 間の矛盾が解決できない | Product と Engineering で意見が対立 |
-| 重大なビジネス判断 | セキュリティ方針の決定 |
-| 不可逆な決定 | 既存データの移行方針 |
+| Situation | Example |
+|-----------|---------|
+| Instruction is too vague | "Make it better" alone doesn't clarify direction |
+| VP conflicts cannot be resolved | Product and Engineering disagree |
+| Major business decisions | Security policy decisions |
+| Irreversible decisions | Existing data migration policy |
 
-### エスカレーションの流れ
+### Escalation Flow
 
 ```
-1. CEO が判断を求める
+1. CEO requests a decision
    ↓
-2. macOS 通知が届く (音付き)
+2. macOS notification arrives (with sound)
    ↓
-3. あなた: /ad:ans SESSION_ID で内容を確認
+3. You: Check content with /ad:ans SESSION_ID
    ↓
-4. あなた: /ad:ans SESSION_ID "回答" で回答
+4. You: Respond with /ad:ans SESSION_ID "answer"
    ↓
-5. CEO が回答を検知して作業続行
+5. CEO detects the answer and continues work
 ```
 
-## ディレクトリ構造
+## Directory Structure
 
-セッションごとに作業ディレクトリが作成されます:
+A working directory is created for each session:
 
 ```
 .auto-dev/sessions/{session_id}/
-├── instruction.txt        # あなたの指示
-├── session.json           # セッション状態 (再開用)
-├── blackboard/            # エージェント間通信
+├── instruction.txt        # Your instruction
+├── session.json           # Session state (for resumption)
+├── blackboard/            # Inter-agent communication
 │   ├── ceo-directive.json
 │   ├── vp-product.json
 │   ├── vp-design.json
 │   ├── vp-engineering.json
 │   └── ...
-├── escalations/           # エスカレーション
+├── escalations/           # Escalations
 │   ├── 1706234567.json
 │   └── 1706234567-answer.json
-├── implementation/        # 実装作業
-└── pr/                    # PR 関連
+├── implementation/        # Implementation work
+└── pr/                    # PR related
 ```
 
-## 組織構成
+## Organization Structure
 
-### 経営層
-- **CEO**: 指示を解釈し、全体を統括。VP 間の調整、エスカレーション判断
+### Executive Level
+- **CEO**: Interprets instructions and coordinates everything. Manages VP coordination and escalation decisions
 
-### VP (部門長)
-- **VP Product**: 要件定義、優先度決定
-- **VP Design**: UX/UI 設計、デザイン判断
-- **VP Engineering**: 技術方針、アーキテクチャ、実装統括
+### VP (Department Heads)
+- **VP Product**: Requirements definition, priority decisions
+- **VP Design**: UX/UI design, design decisions
+- **VP Engineering**: Technical direction, architecture, implementation coordination
 
-### メンバー (VP が必要に応じて召集)
-- **PM-1, PM-2**: ユーザーニーズ調査、スコープ分析
-- **UX, IA**: インタラクション設計、情報設計
-- **Dev-1, Dev-2**: コードベース調査、技術分析
-- **Builder** (N体): 実際のコード実装
+### Members (Summoned by VPs as needed)
+- **PM-1, PM-2**: User needs research, scope analysis
+- **UX, IA**: Interaction design, information architecture
+- **Dev-1, Dev-2**: Codebase investigation, technical analysis
+- **Builder** (N instances): Actual code implementation
 
-### 専門チーム
-- **QA Lead**: 品質監査統括 (常に2体以上の QA を召集)
-  - QA-Security: セキュリティ監査
-  - QA-Performance: パフォーマンス監査
-  - QA-Documentation: ドキュメント監査
-- **DevOps Lead**: Worktree 管理、ビルド、PR 作成
-- **Review Sentinel**: PR レビューコメントの自動監視・対応
+### Specialist Teams
+- **QA Lead**: Quality audit coordination (always summons 2+ QA members)
+  - QA-Security: Security audit
+  - QA-Performance: Performance audit
+  - QA-Documentation: Documentation audit
+- **DevOps Lead**: Worktree management, builds, PR creation
+- **Review Sentinel**: Automatic monitoring and handling of PR review comments
 
-## 指示のコツ
+## Tips for Instructions
 
-### 良い指示
+### Good Instructions
 
 ```bash
-# 目的が明確
-/ad:run "ユーザーがパスワードを忘れた時にリセットできる機能を追加して"
+# Clear purpose
+/ad:run "Add a feature that allows users to reset their password when forgotten"
 
-# 制約がある場合は伝える
-/ad:run "ログイン画面のデザインを改善して。ただし既存のカラースキームは維持"
+# Communicate constraints if any
+/ad:run "Improve the login screen design. However, maintain the existing color scheme"
 
-# 調査だけしてほしい時
-/ad:run "現在の API エンドポイント一覧と認証方式をまとめて (実装は不要)"
+# When you only want investigation
+/ad:run "Compile a list of current API endpoints and authentication methods (no implementation needed)"
 ```
 
-### CEO が困る指示
+### Instructions That Trouble CEO
 
 ```bash
-# 曖昧すぎる (エスカレーションされる可能性)
-/ad:run "良くして"
+# Too vague (may result in escalation)
+/ad:run "Make it better"
 
-# 矛盾している
-/ad:run "高速にして。でもコードは1行も変えないで"
+# Contradictory
+/ad:run "Make it faster. But don't change a single line of code"
 ```
 
-## トラブルシューティング
+## Troubleshooting
 
-### セッションが止まったように見える
+### Session Appears to Be Stuck
 
 ```bash
-# 状態を確認
+# Check status
 /ad:status
 
-# 該当 window に切り替えて CEO pane を確認
+# Switch to the relevant window and check CEO pane
 tmux select-window -t auto-dev:1
 ```
 
-### エスカレーションに気づかなかった
+### Missed an Escalation
 
 ```bash
-# 全セッションのエスカレーションを確認
+# Check escalations for all sessions
 /ad:ans SESSION_ID
 ```
 
-### やり直したい
+### Want to Start Over
 
 ```bash
-# セッションをクリーンアップして再実行
+# Cleanup session and re-run
 /ad:cleanup
-/ad:run "指示"
+/ad:run "instruction"
 ```
 
-## 注意事項
+## Notes
 
-- **tmux が必要です**: このプラグインは tmux を使用します
-- **Command Center で操作**: `/ad:run` は必ず window 0 (Command Center) で実行
-- **エスカレーションに応答**: CEO からの質問には `/ad:ans` で回答してください
-- **並列実行可能**: 複数のセッションを同時に実行できます
+- **tmux is required**: This plugin uses tmux
+- **Operate from Command Center**: Always run `/ad:run` from window 0 (Command Center)
+- **Respond to escalations**: Answer CEO's questions with `/ad:ans`
+- **Parallel execution possible**: Multiple sessions can run simultaneously
 
-## スクリプト一覧
+## Script List
 
-| スクリプト | 用途 |
-|-----------|------|
-| `dashboard.sh ad_init` | tmux セッション初期化 |
-| `adwatch.sh` | 全セッション横断モニター |
-| `adlog.sh` | エージェントログ表示 |
-| `spinup.sh` | エージェント起動 (内部用) |
-| `teardown.sh` | クリーンアップ (内部用) |
-| `escalate.sh` | エスカレーション送信 (内部用) |
-| `notify.sh` | macOS 通知 (内部用) |
+| Script | Purpose |
+|--------|---------|
+| `dashboard.sh ad_init` | Initialize tmux session |
+| `adwatch.sh` | Cross-session monitor |
+| `adlog.sh` | Display agent logs |
+| `spinup.sh` | Start agents (internal use) |
+| `teardown.sh` | Cleanup (internal use) |
+| `escalate.sh` | Send escalation (internal use) |
+| `notify.sh` | macOS notification (internal use) |
 
-## ライセンス
+## License
 
 MIT License

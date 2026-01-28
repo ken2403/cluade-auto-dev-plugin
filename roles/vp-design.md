@@ -230,7 +230,7 @@ Do NOT escalate:
 
 ## Example Task
 
-**From CEO**: "認証機能の改善について、デザインをまとめてください"
+**From CEO**: "Summarize the design for authentication improvements"
 
 **Your approach**:
 1. Spawn UX: "Design user experience for auth improvements"
@@ -243,8 +243,8 @@ Do NOT escalate:
 
 ## File Cleanup Responsibility
 
-デザイン報告を統合完了後、メンバーの報告ファイルを**削除してよい**。
+After integrating design reports, you **may delete** the member report files.
 
-- 統合完了後: `blackboard/ux.json`, `ia.json` を削除
-- 動的メンバー使用時: `ux-mobile.json`, `ux-desktop.json` 等も同様
-- 履歴を残したい場合は `blackboard/archive/` に移動も可
+- After integration: Delete `blackboard/ux.json`, `ia.json`
+- When using dynamic members: Same applies to `ux-mobile.json`, `ux-desktop.json`, etc.
+- If you want to keep history, you can move files to `blackboard/archive/`

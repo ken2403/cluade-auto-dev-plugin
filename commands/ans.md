@@ -7,28 +7,28 @@ model: haiku
 
 # /ad:ans - Answer Escalation
 
-エスカレーションに回答する。
+Answer an escalation from CEO.
 
 ## Usage
 
 ```bash
-/ad:ans SESSION_ID "回答内容"
-/ad:ans SESSION_ID                    # エスカレーション一覧を表示
-/ad:ans SESSION_ID ESCALATION_ID "回答"  # 特定のエスカレーションに回答
+/ad:ans SESSION_ID "answer"
+/ad:ans SESSION_ID                    # List all escalations
+/ad:ans SESSION_ID ESCALATION_ID "answer"  # Answer specific escalation
 ```
 
 ## Behavior
 
-### 回答を送信 (`/ad:ans SESSION_ID "回答"`)
+### Submit Answer (`/ad:ans SESSION_ID "answer"`)
 
-1. セッションの pending エスカレーションを検索
-2. 最新のエスカレーションに回答を書き込み
-3. CEOが検知できるよう answer ファイルを作成
-4. 通知ログに記録
+1. Search for pending escalations in the session
+2. Write answer to the latest escalation
+3. Create answer file for CEO to detect
+4. Record in notification log
 
-### エスカレーション一覧 (`/ad:ans SESSION_ID`)
+### List Escalations (`/ad:ans SESSION_ID`)
 
-該当セッションの全エスカレーションを表示。
+Display all escalations for the specified session.
 
 ## Implementation
 
@@ -134,9 +134,9 @@ echo "CEO will detect this answer and continue work."
 
 ## Answer File Format
 
-回答は2つの場所に書き込まれます：
+Answers are written to two locations:
 
-### 1. Answer File (CEOが検知用)
+### 1. Answer File (for CEO detection)
 ```
 .auto-dev/sessions/{session_id}/escalations/{escalation_id}-answer.json
 ```
@@ -144,13 +144,13 @@ echo "CEO will detect this answer and continue work."
 ```json
 {
   "escalation_id": "1706234567",
-  "answer": "TOTPのみでOK。SMSは後回しで。",
+  "answer": "TOTP only is fine. SMS can wait.",
   "answered_at": "2024-01-26T12:00:00+09:00",
   "answered_by": "human"
 }
 ```
 
-### 2. Original Escalation (更新)
+### 2. Original Escalation (updated)
 ```
 .auto-dev/sessions/{session_id}/escalations/{escalation_id}.json
 ```
@@ -159,45 +159,45 @@ echo "CEO will detect this answer and continue work."
 {
   "id": "1706234567",
   "timestamp": "2024-01-26T11:55:00+09:00",
-  "summary": "MFAの実装方式について判断が必要",
+  "summary": "Decision needed on MFA implementation",
   "details": { ... },
   "status": "answered",      // pending → answered
-  "answer": "TOTPのみでOK",  // 追加
-  "answered_at": "2024-01-26T12:00:00+09:00"  // 追加
+  "answer": "TOTP only is fine",  // added
+  "answered_at": "2024-01-26T12:00:00+09:00"  // added
 }
 ```
 
 ## CEO Detection
 
-CEOは `blackboard-watcher` で `-answer.json` ファイルの出現を監視します：
+CEO monitors for `-answer.json` files using `blackboard-watcher`:
 
 ```
-blackboard-watcher を使って監視:
+Using blackboard-watcher to monitor:
   Directory: .auto-dev/sessions/{session_id}/escalations/
   Pattern: *-answer.json
-  Action: 回答ファイルが出現したら読み込んで作業続行
+  Action: When answer file appears, read it and continue work
 ```
 
 ## Examples
 
 ```bash
-# エスカレーション一覧を見る
+# List escalations
 > /ad:ans abc123
 
 Escalations for session: abc123
 ==================================
 
 ⚠️  [1706234567] PENDING
-    MFAの実装方式について判断が必要
+    Decision needed on MFA implementation
     Time: 2024-01-26T11:55:00+09:00
 
-# 回答する
-> /ad:ans abc123 "TOTPのみでOK。SMSは後回しで。"
+# Submit answer
+> /ad:ans abc123 "TOTP only is fine. SMS can wait."
 
 ✓ Answer submitted for escalation 1706234567
 
-Escalation: MFAの実装方式について判断が必要
-Answer: TOTPのみでOK。SMSは後回しで。
+Escalation: Decision needed on MFA implementation
+Answer: TOTP only is fine. SMS can wait.
 
 CEO will detect this answer and continue work.
 ```

@@ -27,19 +27,19 @@ Auto Dev Sessions
 =================
 
 [a1b2c3d4] running (implementation)
-  "ユーザー認証にMFAを追加して..."
+  "Add MFA to user authentication..."
   Started: 2024-01-01 10:00
   Active agents: 3 (CEO, VP-Eng, Builder-1)
   Escalations: 0
 
 [e5f6g7h8] paused (qa_review)
-  "ログインページの404エラーを修正..."
+  "Fix 404 error on login page..."
   Started: 2024-01-01 09:30
   Active agents: 0
   Escalations: 1 ⚠️
 
 [i9j0k1l2] completed (merged)
-  "READMEを更新..."
+  "Update README..."
   Started: 2024-01-01 08:00
   Completed: 2024-01-01 08:45
   PR: #123 (merged)
@@ -55,7 +55,7 @@ Display detailed status:
 Session: a1b2c3d4
 ==================
 
-Instruction: "ユーザー認証にMFAを追加して"
+Instruction: "Add MFA to user authentication"
 Status: running
 Phase: implementation
 Started: 2024-01-01 10:00:00
@@ -269,7 +269,7 @@ Auto Dev Sessions
 =================
 
 [a1b2c3d4] running (implementation)
-  "ユーザー認証にMFAを追加して..."
+  "Add MFA to user authentication..."
   Active agents: 3
   Escalations: 0
 
@@ -282,7 +282,7 @@ Total: 1 sessions (1 running)
 Session: a1b2c3d4
 ==================
 
-Instruction: "ユーザー認証にMFAを追加して"
+Instruction: "Add MFA to user authentication"
 Status: running
 Phase: implementation
 ...

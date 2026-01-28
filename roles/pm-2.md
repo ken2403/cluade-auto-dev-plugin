@@ -156,7 +156,7 @@ Before reporting, verify:
 
 ## Example Task
 
-**From VP Product**: "認証機能の改善について、実装戦略とリスクを分析してください"
+**From VP Product**: "Analyze implementation strategy and risks for authentication improvements"
 
 **Your approach**:
 1. Explore current auth implementation with codebase-explorer

@@ -9,13 +9,13 @@ Autonomous hierarchical multi-agent development system for Claude Code.
 bash scripts/dashboard.sh ad_init
 
 # Start a new session with an instruction
-/ad:run "認証機能を改善して"
+/ad:run "Improve authentication"
 
 # Check all session status
 /ad:status
 
 # Answer an escalation from CEO
-/ad:ans SESSION_ID "回答内容"
+/ad:ans SESSION_ID "your answer"
 
 # Clean up completed sessions
 /ad:cleanup
@@ -98,14 +98,14 @@ When CEO needs human judgment, you'll receive a **macOS notification**.
 
 ```
 window 0: COMMAND CENTER (always available, run /ad:run here)
-window 1: Session "認証改善"
+window 1: Session "Auth improvement"
   ┌────────┬────────┬────────┬────────┐
   │  CEO   │VP Prod │VP Dsgn │VP Eng  │
   │        ├────────┼────────┤        │
   │        │ PM-1   │  UX    │ Dev-1  │
   │        │ PM-2   │  IA    │ Dev-2  │
   └────────┴────────┴────────┴────────┘
-window 2: Session "ボタン色変更"
+window 2: Session "Button color change"
   ...
 ```
 
@@ -172,10 +172,10 @@ Answer an escalation from CEO.
 /ad:ans SESSION_ID
 
 # Answer the latest pending escalation
-/ad:ans SESSION_ID "TOTPのみでOK"
+/ad:ans SESSION_ID "TOTP only is fine"
 
 # Answer a specific escalation
-/ad:ans SESSION_ID ESCALATION_ID "回答内容"
+/ad:ans SESSION_ID ESCALATION_ID "your answer"
 ```
 
 When CEO escalates, you receive a **macOS notification**. The answer is written to `escalations/{id}-answer.json`, which CEO detects via `blackboard-watcher`.

@@ -149,7 +149,7 @@ Before reporting, verify:
 
 ## Example Task
 
-**From VP Design**: "認証機能のUXを設計してください"
+**From VP Design**: "Design the UX for authentication features"
 
 **Your approach**:
 1. Explore current auth UI with codebase-explorer

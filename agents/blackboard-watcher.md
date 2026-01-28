@@ -95,7 +95,7 @@ Wait for .auto-dev/sessions/abc123/blackboard/vp-product.json:
 }
 ```
 
-**Important**: タイムアウトは**停止シグナルではない**。呼び出し元 (CEO/VP) は `recommended_actions` を参考に自律的に次のアクションを判断すること。
+**Important**: A timeout is **not a stop signal**. The caller (CEO/VP) should autonomously determine the next action by referring to `recommended_actions`.
 
 ### Change Detection
 ```json

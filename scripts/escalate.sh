@@ -36,7 +36,7 @@ echo "Escalation written to: $ESCALATION_FILE"
 
 # Send notification
 bash "$SCRIPT_DIR/notify.sh" \
-    "⚠️ Auto Dev: 判断が必要" \
+    "⚠️ Auto Dev: Decision needed" \
     "$SUMMARY" \
     "$SESSION_ID"
 

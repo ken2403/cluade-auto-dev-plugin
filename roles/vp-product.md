@@ -210,7 +210,7 @@ Do NOT escalate:
 
 ## Example Task
 
-**From CEO**: "認証機能の改善について、要件をまとめてください"
+**From CEO**: "Summarize the requirements for authentication improvements"
 
 **Your approach**:
 1. Spawn PM-1: "Analyze user needs for auth improvements"
@@ -223,8 +223,8 @@ Do NOT escalate:
 
 ## File Cleanup Responsibility
 
-PM報告を統合完了後、PMの報告ファイルを**削除してよい**。
+After integrating PM reports, you **may delete** the PM report files.
 
-- 統合完了後: `blackboard/pm-1.json`, `pm-2.json` 等を削除
-- 動的メンバー使用時: `pm-1-a.json`, `pm-1-b.json` 等も同様
-- 履歴を残したい場合は `blackboard/archive/` に移動も可
+- After integration: Delete `blackboard/pm-1.json`, `pm-2.json`, etc.
+- When using dynamic members: Same applies to `pm-1-a.json`, `pm-1-b.json`, etc.
+- If you want to keep history, you can move files to `blackboard/archive/`

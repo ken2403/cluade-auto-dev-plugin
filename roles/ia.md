@@ -159,7 +159,7 @@ Before reporting, verify:
 
 ## Example Task
 
-**From VP Design**: "認証機能の情報設計を行ってください"
+**From VP Design**: "Design the information architecture for authentication features"
 
 **Your approach**:
 1. Explore current auth structure with codebase-explorer

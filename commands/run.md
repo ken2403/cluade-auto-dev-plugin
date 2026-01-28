@@ -79,7 +79,7 @@ WINDOW_NUM=$(bash scripts/dashboard.sh ad_new_window "$SESSION_ID" "$INSTRUCTION
 
 # Spawn CEO in the new window
 bash scripts/spinup.sh "$SESSION_ID" ceo \
-  "Godからの指示: $INSTRUCTION。作業ディレクトリ: .auto-dev/sessions/$SESSION_ID/"
+  "Instruction from God: $INSTRUCTION. Working directory: .auto-dev/sessions/$SESSION_ID/"
 
 # Report to user
 echo "Session $SESSION_ID started in tmux window $WINDOW_NUM"
@@ -107,7 +107,7 @@ fi
 
 # Spawn CEO with resume context
 bash scripts/spinup.sh "$SESSION_ID" ceo \
-  "セッション再開。前回のフェーズ: $PHASE。作業ディレクトリ: .auto-dev/sessions/$SESSION_ID/。session.jsonとblackboard/を確認して続きを実行してください。"
+  "Session resumed. Previous phase: $PHASE. Working directory: .auto-dev/sessions/$SESSION_ID/. Check session.json and blackboard/ to continue."
 
 # Report to user
 echo "Session $SESSION_ID resumed in tmux window $WINDOW_NUM"
@@ -207,12 +207,12 @@ Window N: Session "{short_instruction}"
 
 ### Start a new feature
 ```
-/ad:run "ユーザー認証にMFAを追加して"
+/ad:run "Add MFA to user authentication"
 ```
 
 ### Quick fix
 ```
-/ad:run "ログインページの404エラーを修正"
+/ad:run "Fix 404 error on login page"
 ```
 
 ### Resume interrupted session

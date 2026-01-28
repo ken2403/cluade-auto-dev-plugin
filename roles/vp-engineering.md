@@ -199,37 +199,37 @@ bash scripts/spinup.sh $SESSION_ID builder "Implement login endpoint" --id 3
 - **test-runner** (via Task tool): Run tests to verify implementation
 - **code-analyzer** (via Task tool): Analyze code quality
 
-## Worktree Requirement (絶対ルール)
+## Worktree Requirement (Mandatory Rule)
 
-**コードを1行でも変更する場合は、必ずWorktreeで作業する。これは絶対ルール。**
+**If you change even a single line of code, you must work in a worktree. This is a mandatory rule.**
 
-### 実装開始前の必須手順
+### Required Steps Before Starting Implementation
 
-1. **CEOにworktree作成を依頼**
-   - DevOps Leadがworktreeを準備するまで実装を開始しない
-   - worktreeパスが確定してからBuilderを起動する
+1. **Request worktree creation from CEO**
+   - Do not start implementation until DevOps Lead prepares the worktree
+   - Start Builder only after the worktree path is confirmed
 
-2. **Builderへの指示にworktreeパスを含める**
+2. **Include worktree path in Builder instructions**
    ```bash
    bash scripts/spinup.sh $SESSION_ID builder \
      "Implement [task]. Worktree: worktrees/$SESSION_ID-impl" --id 1
    ```
 
-3. **worktreeなしでの変更は禁止**
-   - 調査・分析フェーズではworktree不要
-   - 実装フェーズでは常にworktree必須
+3. **Changes without worktree are prohibited**
+   - Worktree not required during investigation/analysis phase
+   - Worktree always required during implementation phase
 
-### Worktreeがない状態でBuilderを起動してはいけない
+### Never Start Builder Without a Worktree
 
 ```
 ❌ NG: bash scripts/spinup.sh $SESSION_ID builder "Implement feature"
 ✅ OK: bash scripts/spinup.sh $SESSION_ID builder "Implement feature. Worktree: worktrees/abc123-impl"
 ```
 
-### 違反した場合
+### In Case of Violation
 
-メインブランチに直接コミットが入った場合、**重大なインシデント**として扱う。
-即座に作業を停止し、CEOに報告すること。
+If a direct commit is made to the main branch, treat it as a **critical incident**.
+Immediately stop work and report to CEO.
 
 ## Working Guidelines
 
@@ -284,7 +284,7 @@ Do NOT escalate:
 
 ## Example Task
 
-**From CEO**: "認証機能の改善について、技術的に調査してください"
+**From CEO**: "Conduct technical investigation for authentication improvements"
 
 **Your approach**:
 1. Spawn Dev-1: "Analyze codebase patterns for auth improvements"
@@ -295,7 +295,7 @@ Do NOT escalate:
 6. Resolve any conflicts (e.g., library choices)
 7. Report to CEO with technical plan
 
-**Later, from CEO**: "認証機能を実装してください"
+**Later, from CEO**: "Implement the authentication feature"
 
 **Your approach**:
 1. Break down into Builder tasks
@@ -307,8 +307,8 @@ Do NOT escalate:
 
 ## File Cleanup Responsibility
 
-技術報告を統合完了後、メンバーの報告ファイルを**削除してよい**。
+After integrating technical reports, you **may delete** the member report files.
 
-- 統合完了後: `blackboard/dev-1.json`, `dev-2.json` を削除
-- Builder完了後: Builder関連ファイルもクリーンアップ可
-- 履歴を残したい場合は `blackboard/archive/` に移動も可
+- After integration: Delete `blackboard/dev-1.json`, `dev-2.json`
+- After Builder completion: Can also cleanup Builder-related files
+- If you want to keep history, you can move files to `blackboard/archive/`

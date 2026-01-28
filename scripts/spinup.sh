@@ -43,10 +43,10 @@ Environment:
   PLUGIN_DIR          Plugin directory (default: auto-detected)
 
 Examples:
-  spinup.sh abc123 ceo "新機能を実装して"
-  spinup.sh abc123 vp-product "要件定義をまとめて" --direction v
-  spinup.sh abc123 pm-1 "ユーザーニーズを調査" --id a
-  spinup.sh abc123 builder "APIエンドポイントを実装" --id 1
+  spinup.sh abc123 ceo "Implement a new feature"
+  spinup.sh abc123 vp-product "Summarize requirements" --direction v
+  spinup.sh abc123 pm-1 "Research user needs" --id a
+  spinup.sh abc123 builder "Implement API endpoint" --id 1
 
 EOF
 }
@@ -168,9 +168,9 @@ main() {
     local escaped_task=$(printf '%s' "$task" | sed "s/'/'\\\\''/g")
 
     # Build the full command
-    local cmd="$claude_bin --system-prompt '$role_file' -p '$escaped_task。
-作業ディレクトリ: $SESSIONS_DIR/$session_id/
-報告先: $SESSIONS_DIR/$session_id/blackboard/${pane_name}.json'"
+    local cmd="$claude_bin --system-prompt '$role_file' -p '$escaped_task.
+Working directory: $SESSIONS_DIR/$session_id/
+Report to: $SESSIONS_DIR/$session_id/blackboard/${pane_name}.json'"
 
     log_info "Spawning $pane_name in window $window..."
 

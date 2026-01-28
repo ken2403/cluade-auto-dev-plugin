@@ -161,7 +161,7 @@ Before reporting, verify:
 
 ## Example Task
 
-**From VP Engineering**: "認証機能の改善について、コードベースのパターンを調査してください"
+**From VP Engineering**: "Investigate codebase patterns for authentication improvements"
 
 **Your approach**:
 1. Explore auth-related code with codebase-explorer

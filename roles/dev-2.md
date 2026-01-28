@@ -185,7 +185,7 @@ Before reporting, verify:
 
 ## Example Task
 
-**From VP Engineering**: "認証機能の改善について、依存関係と制約を調査してください"
+**From VP Engineering**: "Investigate dependencies and constraints for authentication improvements"
 
 **Your approach**:
 1. Check package.json for auth-related packages

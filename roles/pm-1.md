@@ -124,7 +124,7 @@ Before reporting, verify:
 
 ## Example Task
 
-**From VP Product**: "認証機能の改善について、ユーザーニーズを調査してください"
+**From VP Product**: "Research user needs for authentication improvements"
 
 **Your approach**:
 1. Explore current auth flow with codebase-explorer

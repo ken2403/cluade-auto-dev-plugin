@@ -205,7 +205,7 @@ Do NOT escalate:
 
 ## Example Task
 
-**From CEO**: "認証機能の実装をQAしてください。変更ファイル: src/auth/*, tests/auth/*"
+**From CEO**: "QA the authentication implementation. Changed files: src/auth/*, tests/auth/*"
 
 **Your approach**:
 1. Spawn QA-Security: "Review security of auth changes"
@@ -219,7 +219,7 @@ Do NOT escalate:
 
 ## File Cleanup Responsibility
 
-QA報告を統合完了後、QAメンバーの報告ファイルを**削除してよい**。
+After integrating QA reports, you **may delete** the QA member report files.
 
-- 統合完了後: `blackboard/qa-security.json`, `qa-performance.json` 等を削除
-- 履歴を残したい場合は `blackboard/archive/` に移動も可
+- After integration: Delete `blackboard/qa-security.json`, `qa-performance.json`, etc.
+- If you want to keep history, you can move files to `blackboard/archive/`
