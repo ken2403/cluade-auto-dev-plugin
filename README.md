@@ -16,6 +16,60 @@
 PM  UX  Dev (調査・実装)
 ```
 
+## 必要要件
+
+- **Claude Code CLI** (claude コマンドが使える状態)
+- **tmux** (マルチペイン管理用)
+- **macOS** (通知機能用。Linux でも動作しますが通知は出ません)
+
+## インストール
+
+### 方法1: Claude Code のプラグインとして使う (推奨)
+
+```bash
+# 1. リポジトリをクローン
+git clone https://github.com/ken2403/claude-auto-dev-plugin.git
+
+# 2. 作業したいプロジェクトに移動
+cd your-project-directory
+
+# 3. プラグインを有効化 (シンボリックリンク作成)
+ln -s /path/to/claude-auto-dev-plugin/.claude-plugin .claude-plugin
+
+# 4. CLAUDE.md もリンク (オプション)
+ln -s /path/to/claude-auto-dev-plugin/CLAUDE.md .claude/plugins/auto-dev.md
+```
+
+### 方法2: プロジェクト内にコピー
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/ken2403/claude-auto-dev-plugin.git
+
+# プロジェクトにコピー
+cp -r claude-auto-dev-plugin/.claude-plugin your-project/.claude-plugin
+cp -r claude-auto-dev-plugin/roles your-project/.claude-plugin/roles
+cp -r claude-auto-dev-plugin/agents your-project/.claude-plugin/agents
+cp -r claude-auto-dev-plugin/scripts your-project/.claude-plugin/scripts
+cp -r claude-auto-dev-plugin/commands your-project/.claude-plugin/commands
+cp -r claude-auto-dev-plugin/skills your-project/.claude-plugin/skills
+cp -r claude-auto-dev-plugin/templates your-project/.claude-plugin/templates
+cp -r claude-auto-dev-plugin/hooks your-project/.claude-plugin/hooks
+```
+
+### インストール確認
+
+```bash
+# Claude Code を起動
+cd your-project-directory
+claude
+
+# プラグインが認識されているか確認
+/ad:status
+```
+
+`/ad:status` が動けばインストール成功です。
+
 ## クイックスタート
 
 ### 1. 初期化 (初回のみ)
