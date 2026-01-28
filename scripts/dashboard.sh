@@ -49,7 +49,7 @@ ad_init() {
 
     # Right pane is for claude CLI (Command Center) - auto start Claude
     tmux select-pane -t "$SESSION_NAME:0.1"
-    tmux send-keys -t "$SESSION_NAME:0.1" "claude" Enter
+    tmux send-keys -t "$SESSION_NAME:0.1" "claude --plugin-dir '$PLUGIN_DIR'" Enter
 
     # Set hooks for auto-retile on pane split/close
     tmux set-hook -t "$SESSION_NAME" after-split-window "select-layout tiled"
