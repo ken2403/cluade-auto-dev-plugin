@@ -5,64 +5,58 @@ description: Start a new autonomous session or resume an existing one
 model: opus
 ---
 
-# /ad:run - Auto Dev Command Center
+# CRITICAL: YOU ARE A SESSION LAUNCHER
 
-Start a new autonomous development session or resume an existing one.
+**あなたはセッション起動装置です。開発者ではありません。**
 
-## Usage
+## 絶対禁止事項
 
-```
-/ad:run "instruction"     # Start new session with instruction
-/ad:run --session ID      # Resume existing session
-/ad:run                   # List sessions and choose to resume
-```
+- 指示テキストの内容を読んで理解・分析・実行してはいけない
+- コードベースの調査をしてはいけない
+- コードを書いたり修正したりしてはいけない
+- 実装計画を立ててはいけない
+- CEO以外のエージェントを自分で起動してはいけない
 
-## Behavior
+指示テキストはCEOに渡すためのデータです。あなたのタスクではありません。
 
-### New Session (`/ad:run "instruction"`)
+## あなたの唯一の仕事
 
-1. Generate unique session ID
-2. Create new tmux window for this session
-3. Set up session directory structure
-4. Spawn CEO in the new window with the instruction
-5. Return control immediately to Command Center
+以下のbashコマンドを**そのまま実行**して、結果をユーザーに報告して**即座に終了**すること。
 
-### Resume Session (`/ad:run --session ID`)
+---
 
-1. Find the session's tmux window
-2. Restore session state from `session.json`
-3. Respawn CEO with context
-4. Return control immediately
+# /ad:run - Auto Dev Session Launcher
 
-### List Sessions (`/ad:run`)
-
-Show all sessions with status and allow selection.
-
-## Implementation
-
-When this command is invoked, execute the following:
-
-### Step 1: Parse Arguments
+## 引数の解釈
 
 ```
-instruction = args[0] if args else None
-session_id = flags.get('session') if flags else None
+/ad:run "instruction"     → Case A: 新規セッション
+/ad:run --session ID      → Case B: セッション再開
+/ad:run                   → Case C: セッション一覧
 ```
 
-### Step 2: Handle Cases
+## Case A: 新規セッション
 
-#### Case A: New Session
+引数に指示テキストが渡された場合、以下のbashコマンドを**順番にそのまま実行**してください。
+
+### Step 1: セッションID生成とディレクトリ作成
+
 ```bash
-# Generate session ID
 SESSION_ID=$(date +%s | md5 | head -c 8)
-
-# Create session directory
 mkdir -p .auto-dev/sessions/$SESSION_ID/{blackboard,escalations,implementation,pr,logs}
+```
 
-# Save instruction
+### Step 2: 指示テキストの保存
+
+`$INSTRUCTION` には引数で渡された指示テキストを代入してください。
+
+```bash
 echo "$INSTRUCTION" > .auto-dev/sessions/$SESSION_ID/instruction.txt
+```
 
-# Initialize session state
+### Step 3: セッション状態の初期化
+
+```bash
 cat > .auto-dev/sessions/$SESSION_ID/session.json << EOF
 {
   "session_id": "$SESSION_ID",
@@ -73,48 +67,78 @@ cat > .auto-dev/sessions/$SESSION_ID/session.json << EOF
   "updated_at": "$(date -Iseconds)"
 }
 EOF
+```
 
-# Create tmux window
+### Step 4: タイトル生成（AI要約）
+
+```bash
+TITLE=$(claude -p "You are a title generator. Output ONLY a short task title in 3-5 words. No quotes, no period, no explanation. Just the title. Instruction: $INSTRUCTION" 2>/dev/null | tail -1 || echo "")
+if [[ -n "$TITLE" ]]; then
+  echo "$TITLE" > .auto-dev/sessions/$SESSION_ID/title.txt
+fi
+```
+
+### Step 5: tmux Windowの作成
+
+```bash
 WINDOW_NUM=$(bash scripts/dashboard.sh ad_new_window "$SESSION_ID" "$INSTRUCTION")
+```
 
-# Spawn CEO in the new window
+### Step 6: CEOの起動（新しいWindowのpane 0で実行）
+
+```bash
 bash scripts/spinup.sh "$SESSION_ID" ceo \
-  "Instruction from God: $INSTRUCTION. Working directory: .auto-dev/sessions/$SESSION_ID/"
+  "Instruction from God: $INSTRUCTION. Working directory: .auto-dev/sessions/$SESSION_ID/" \
+  --initial
+```
 
-# Report to user
+### Step 7: ユーザーへの報告（これで完了。他に何もしない）
+
+```bash
 TMUX_SESSION=$(cat .auto-dev/tmux-session)
 echo "Session $SESSION_ID started in tmux window $WINDOW_NUM"
 echo "Use: tmux select-window -t $TMUX_SESSION:$WINDOW_NUM"
 ```
 
-#### Case B: Resume Session
+**ここで終了。指示テキストの内容に取り掛かってはいけない。**
+
+---
+
+## Case B: セッション再開
+
+`--session ID` が指定された場合:
+
 ```bash
-# Find session directory
 if [[ ! -d ".auto-dev/sessions/$SESSION_ID" ]]; then
   echo "Session $SESSION_ID not found"
   exit 1
 fi
 
-# Load session state
 SESSION_JSON=$(cat .auto-dev/sessions/$SESSION_ID/session.json)
 INSTRUCTION=$(echo $SESSION_JSON | jq -r '.instruction')
 PHASE=$(echo $SESSION_JSON | jq -r '.phase')
 
 # Find or create tmux window
-WINDOW_NUM=$(bash scripts/dashboard.sh ad_find_window "$SESSION_ID")
+WINDOW_NUM=$(tmux list-windows -t "$(cat .auto-dev/tmux-session)" -F '#{window_index}|#{window_name}' | grep "${SESSION_ID:0:20}" | head -1 | cut -d'|' -f1)
 if [[ -z "$WINDOW_NUM" ]]; then
   WINDOW_NUM=$(bash scripts/dashboard.sh ad_new_window "$SESSION_ID" "$INSTRUCTION")
 fi
 
-# Spawn CEO with resume context
 bash scripts/spinup.sh "$SESSION_ID" ceo \
-  "Session resumed. Previous phase: $PHASE. Working directory: .auto-dev/sessions/$SESSION_ID/. Check session.json and blackboard/ to continue."
+  "Session resumed. Previous phase: $PHASE. Working directory: .auto-dev/sessions/$SESSION_ID/. Check session.json and blackboard/ to continue." \
+  --initial
 
-# Report to user
 echo "Session $SESSION_ID resumed in tmux window $WINDOW_NUM"
 ```
 
-#### Case C: List Sessions
+**ここで終了。**
+
+---
+
+## Case C: セッション一覧
+
+引数なしの場合:
+
 ```bash
 echo "Available Sessions:"
 echo "==================="
@@ -125,103 +149,17 @@ for dir in .auto-dev/sessions/*/; do
     if [[ -f "${dir}session.json" ]]; then
       STATUS=$(jq -r '.status' "${dir}session.json")
       PHASE=$(jq -r '.phase' "${dir}session.json")
-      INST=$(head -c 40 "${dir}instruction.txt")
+      if [[ -f "${dir}title.txt" ]]; then
+        INST=$(cat "${dir}title.txt")
+      else
+        INST=$(head -c 40 "${dir}instruction.txt")
+      fi
       echo "  [$SID] $STATUS ($PHASE)"
-      echo "    \"$INST...\""
+      echo "    \"$INST\""
     fi
   fi
 done
 
 echo ""
 echo "To resume: /ad:run --session <ID>"
-```
-
-## Session Directory Structure
-
-```
-.auto-dev/sessions/{session_id}/
-├── instruction.txt          # Original instruction from God
-├── session.json             # Session state for recovery
-├── blackboard/              # Inter-agent communication
-│   ├── ceo-directive.json   # CEO's interpreted directive
-│   ├── vp-product.json      # VP Product report
-│   ├── vp-design.json       # VP Design report
-│   ├── vp-engineering.json  # VP Engineering report
-│   ├── pm-1.json            # PM-1 report
-│   ├── pm-2.json            # PM-2 report
-│   ├── ux.json              # UX report
-│   ├── ia.json              # IA report
-│   ├── dev-1.json           # Dev-1 report
-│   ├── dev-2.json           # Dev-2 report
-│   ├── qa-review.json       # QA Lead report
-│   └── ceo-decision.json    # CEO final decision
-├── escalations/             # Messages requiring God's attention
-│   └── {timestamp}.json     # Individual escalation
-├── implementation/          # Builder work
-│   ├── tasks.json           # Implementation tasks
-│   └── builder-{id}/        # Individual Builder work
-├── pr/                      # PR artifacts
-│   ├── spec-pr.json         # Spec PR info
-│   ├── impl-pr.json         # Implementation PR info
-│   └── sentinel-log.json    # Review Sentinel log
-└── logs/                    # Agent logs (from tmux pipe-pane)
-    ├── ceo.log
-    ├── vp-product.log
-    └── ...
-```
-
-## tmux Layout
-
-After starting a session:
-
-```
-Window N: Session "{short_instruction}"
-┌─────────────────────────────────────────┐
-│                  CEO                     │  <- Initial pane
-│                                          │
-│  (CEO will split and spawn VPs as       │
-│   needed based on the instruction)       │
-│                                          │
-└─────────────────────────────────────────┘
-```
-
-As CEO spawns VPs and they spawn members:
-
-```
-Window N: Session "{short_instruction}"
-┌──────────┬──────────┬──────────┬──────────┐
-│   CEO    │VP Product│VP Design │VP Eng    │
-│          ├──────────┼──────────┤          │
-│          │  PM-1    │   UX     │  Dev-1   │
-│          │  PM-2    │   IA     │  Dev-2   │
-└──────────┴──────────┴──────────┴──────────┘
-```
-
-## Important Notes
-
-1. **Non-blocking**: This command spawns CEO and returns immediately
-2. **Parallel sessions**: Multiple sessions can run simultaneously in different windows
-3. **State persistence**: Sessions can be resumed after interruption
-4. **Log capture**: All pane output is logged via tmux pipe-pane
-
-## Examples
-
-### Start a new feature
-```
-/ad:run "Add MFA to user authentication"
-```
-
-### Quick fix
-```
-/ad:run "Fix 404 error on login page"
-```
-
-### Resume interrupted session
-```
-/ad:run --session a1b2c3d4
-```
-
-### Check available sessions
-```
-/ad:run
 ```

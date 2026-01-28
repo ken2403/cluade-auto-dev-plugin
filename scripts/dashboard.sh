@@ -132,17 +132,18 @@ ad_new_window() {
     local next_win=$(tmux list-windows -t "$SESSION_NAME" -F '#{window_index}' | sort -n | tail -1)
     next_win=$((next_win + 1))
 
-    # Create window with session name
-    local win_name="${session_id:0:20}"
+    # Use title.txt for window name if available, otherwise session_id
+    local title_file="$SESSIONS_DIR/$session_id/title.txt"
+    local win_name
+    if [[ -f "$title_file" ]]; then
+        win_name=$(head -c 20 "$title_file" | tr ' ' '-' | tr -d '\n')
+    else
+        win_name="${session_id:0:20}"
+    fi
     tmux new-window -t "$SESSION_NAME:$next_win" -n "$win_name"
 
-    # Set pane title
+    # Set pane title (logging is handled by spinup.sh)
     tmux select-pane -t "$SESSION_NAME:$next_win.0" -T "CEO"
-
-    # Enable logging for this pane
-    local log_dir="$SESSIONS_DIR/$session_id/logs"
-    mkdir -p "$log_dir"
-    tmux pipe-pane -t "$SESSION_NAME:$next_win.0" -o "cat >> '$log_dir/ceo.log'"
 
     log_success "Created window $next_win for session $session_id"
     echo "$next_win"

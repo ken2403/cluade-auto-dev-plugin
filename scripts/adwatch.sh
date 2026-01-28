@@ -61,12 +61,15 @@ get_active_agents() {
     fi
 }
 
-# Get instruction summary
+# Get instruction summary (prefer AI-generated title)
 get_instruction() {
     local session_id="$1"
+    local title_file="$SESSIONS_DIR/$session_id/title.txt"
     local inst_file="$SESSIONS_DIR/$session_id/instruction.txt"
 
-    if [[ -f "$inst_file" ]]; then
+    if [[ -f "$title_file" ]]; then
+        head -c 40 "$title_file" | tr '\n' ' '
+    elif [[ -f "$inst_file" ]]; then
         head -c 40 "$inst_file" | tr '\n' ' '
     else
         echo "-"

@@ -48,6 +48,7 @@ Options:
   -d, --direction DIR Split direction: h=horizontal, v=vertical (default: h)
   --model MODEL       Claude model to use (default: opus)
   --id ID             Instance ID suffix (for multiple same-role agents)
+  --initial           Run in existing pane 0 (send-keys) instead of split-window
 
 Environment:
   CLAUDE_BIN          Path to claude CLI (default: claude)
@@ -86,6 +87,7 @@ main() {
     local direction="h"
     local model="opus"
     local instance_id=""
+    local initial=false
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -113,6 +115,10 @@ main() {
             --id)
                 instance_id="$2"
                 shift 2
+                ;;
+            --initial)
+                initial=true
+                shift
                 ;;
             *)
                 if [[ -z "$session_id" ]]; then
@@ -185,11 +191,16 @@ Report to: $SESSIONS_DIR/$session_id/blackboard/${pane_name}.json'"
 
     log_info "Spawning $pane_name in window $window..."
 
-    # Split and run
-    tmux split-window $split_flag -t "$target" "$cmd"
-
-    # Get new pane ID
-    local new_pane=$(tmux list-panes -t "$SESSION_NAME:$window" -F '#{pane_index}' | tail -1)
+    local new_pane
+    if [[ "$initial" == "true" ]]; then
+        # Use send-keys to run in existing pane 0 (no split)
+        tmux send-keys -t "$SESSION_NAME:$window.0" "$cmd" Enter
+        new_pane=0
+    else
+        # Split and run in new pane
+        tmux split-window $split_flag -t "$target" "$cmd"
+        new_pane=$(tmux list-panes -t "$SESSION_NAME:$window" -F '#{pane_index}' | tail -1)
+    fi
 
     # Set pane title
     tmux select-pane -t "$SESSION_NAME:$window.$new_pane" -T "$pane_name"
@@ -197,8 +208,10 @@ Report to: $SESSIONS_DIR/$session_id/blackboard/${pane_name}.json'"
     # Enable logging
     tmux pipe-pane -t "$SESSION_NAME:$window.$new_pane" -o "cat >> '$log_dir/${pane_name}.log'"
 
-    # Retile
-    tmux select-layout -t "$SESSION_NAME:$window" tiled
+    # Retile (skip for initial since there's only one pane)
+    if [[ "$initial" != "true" ]]; then
+        tmux select-layout -t "$SESSION_NAME:$window" tiled
+    fi
 
     log_success "Spawned $pane_name (pane $new_pane) in window $window"
     echo "$new_pane"

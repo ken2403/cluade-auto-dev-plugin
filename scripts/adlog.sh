@@ -57,8 +57,11 @@ list_sessions() {
             if [[ "$log_count" -gt 0 ]]; then
                 echo -e "  ${BLUE}$session_id${NC} ($log_count logs)"
 
-                # Show instruction preview
-                if [[ -f "${session_dir}instruction.txt" ]]; then
+                # Show instruction preview (prefer AI-generated title)
+                if [[ -f "${session_dir}title.txt" ]]; then
+                    local inst=$(head -c 60 "${session_dir}title.txt" | tr '\n' ' ')
+                    echo -e "    ${DIM}\"$inst\"${NC}"
+                elif [[ -f "${session_dir}instruction.txt" ]]; then
                     local inst=$(head -c 60 "${session_dir}instruction.txt" | tr '\n' ' ')
                     echo -e "    ${DIM}\"$inst\"${NC}"
                 fi
