@@ -99,10 +99,10 @@ When CEO needs human judgment, you'll receive a **macOS notification**.
 ```
 window 0: COMMAND CENTER
   ┌──────────┬──────────────────┐
-  │          │ Claude CLI (20%) │
-  │ adwatch  ├──────────────────┤
-  │  (40%)   │                  │
-  │          │ Terminal (80%)   │
+  │          │                  │
+  │ adwatch  │ Claude CLI (80%) │
+  │  (40%)   ├──────────────────┤
+  │          │ Terminal (20%)   │
   └──────────┴──────────────────┘
 window 1: Session "Auth improvement"
   ┌────────┬────────┬────────┬────────┐

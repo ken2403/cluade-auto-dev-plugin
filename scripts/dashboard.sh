@@ -40,14 +40,14 @@ ad_init() {
     tmux new-session -d -s "$SESSION_NAME" -n "COMMAND-CENTER"
 
     # Set up Command Center layout
-    # Layout: left 40% = adwatch, right top 20% = claude, right bottom 80% = free terminal
+    # Layout: left 40% = adwatch, right top 80% = claude, right bottom 20% = free terminal
     #
     # ┌──────────┬─────────────────┐
-    # │          │  Claude (20%)   │
-    # │ adwatch  ├─────────────────┤
-    # │  (40%)   │                 │
-    # │          │ Terminal (80%)  │
     # │          │                 │
+    # │          │  Claude (80%)   │
+    # │ adwatch  │                 │
+    # │  (40%)   ├─────────────────┤
+    # │          │ Terminal (20%)  │
     # └──────────┴─────────────────┘
 
     # Split horizontally: left (pane 0) | right (pane 1)
@@ -56,7 +56,7 @@ ad_init() {
 
     # Split right pane vertically: top (pane 1) | bottom (pane 2)
     tmux split-window -v -t "$SESSION_NAME:0.1"
-    tmux resize-pane -t "$SESSION_NAME:0.1" -p 20
+    tmux resize-pane -t "$SESSION_NAME:0.1" -p 80
 
     # Pane 0 (left): adwatch
     tmux send-keys -t "$SESSION_NAME:0.0" "bash '$SCRIPT_DIR/adwatch.sh'" Enter
