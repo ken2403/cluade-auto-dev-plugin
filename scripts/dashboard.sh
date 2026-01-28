@@ -95,13 +95,11 @@ ad_init() {
     # │          │ Terminal (20%)  │
     # └──────────┴─────────────────┘
 
-    # Split horizontally: left (pane 0) | right (pane 1)
-    tmux split-window -h -t "$SESSION_NAME:0"
-    tmux resize-pane -t "$SESSION_NAME:0.0" -p 40
+    # Split horizontally: left 40% (pane 0) | right 60% (pane 1)
+    tmux split-window -h -l 60% -t "$SESSION_NAME:0"
 
-    # Split right pane vertically: top (pane 1) | bottom (pane 2)
-    tmux split-window -v -t "$SESSION_NAME:0.1"
-    tmux resize-pane -t "$SESSION_NAME:0.1" -p 80
+    # Split right pane vertically: top 80% (pane 1) | bottom 20% (pane 2)
+    tmux split-window -v -l 20% -t "$SESSION_NAME:0.1"
 
     # Pane 0 (left): adwatch
     tmux send-keys -t "$SESSION_NAME:0.0" "bash '$SCRIPT_DIR/adwatch.sh'" Enter
