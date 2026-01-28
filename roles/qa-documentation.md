@@ -202,6 +202,24 @@ Write findings to the blackboard JSON file specified in your instructions.
 - Performance improvements
 - New utilities/helpers
 
+## Worktree Reminder (重要)
+
+**ドキュメント更新もWorktreeで行う必要がある。**
+
+あなたの役割はドキュメントの問題を**発見・報告**すること。
+実際のドキュメント更新は、doc-writerまたはBuilderがWorktree内で行う。
+
+documentation_planを報告する際、以下を明記:
+- 更新対象ファイルのパス
+- 「これらの更新はWorktree内で実施すること」という注記
+
+```json
+{
+  "documentation_plan": [...],
+  "worktree_note": "All documentation updates must be performed in the worktree. Direct changes to main are not allowed."
+}
+```
+
 ## Output Quality Checklist
 
 Before reporting, verify:
@@ -212,6 +230,7 @@ Before reporting, verify:
 - [ ] Documentation plan is actionable
 - [ ] Priority assigned to each update
 - [ ] Approval recommendation is clear
+- [ ] Worktree requirement noted in plan
 
 ## Documentation Templates
 

@@ -197,6 +197,37 @@ curl -X POST https://api.example.com/path \
 ```
 ```
 
+## Worktree Requirement (絶対ルール)
+
+**ドキュメントをリポジトリに書き込む場合は、必ずWorktreeで作業する。**
+
+### Worktreeが必要な作業
+
+| 作業 | Worktree必要? |
+|-----|--------------|
+| blackboardへの報告JSON書き込み | ❌ 不要 (セッション内データ) |
+| **docs/ へのドキュメント追加** | ✅ **必須** |
+| **README.md の更新** | ✅ **必須** |
+| **API仕様書の追加・更新** | ✅ **必須** |
+| **CHANGELOG.md の更新** | ✅ **必須** |
+| **コードコメントの追加** | ✅ **必須** |
+
+### 作業前の確認
+
+呼び出し元から指定されたoutput_pathを確認:
+
+```
+✅ OK: worktrees/SESSION_ID-xxx/docs/features/auth.md
+❌ NG: docs/features/auth.md (メインの作業ディレクトリ)
+```
+
+Worktreeパスが指定されていない場合は、呼び出し元に確認を求める。
+
+### 「ドキュメントだけ」は例外ではない
+
+README更新、docs追加、コメント追加など、「小さな変更」でもWorktreeを経由する。
+リポジトリ内のすべてのファイル変更はPRを通じてレビューされるべき。
+
 ## Execution Guidelines
 
 1. **Follow templates**: Use consistent structure across documents
@@ -204,6 +235,7 @@ curl -X POST https://api.example.com/path \
 3. **Include examples**: Always provide concrete examples
 4. **Consider audience**: Technical docs for devs, specs for broader team
 5. **Version awareness**: Note which version changes apply to
+6. **Always use worktree**: Never write to main working directory directly
 
 ## Quality Checklist
 
