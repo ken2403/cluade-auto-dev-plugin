@@ -6,8 +6,31 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_DIR="$(dirname "$SCRIPT_DIR")"
-SESSION_NAME="auto-dev"
 SESSIONS_DIR=".auto-dev/sessions"
+SESSION_FILE=".auto-dev/tmux-session"
+
+# Load or generate session name
+load_session_name() {
+    if [[ -f "$SESSION_FILE" ]]; then
+        SESSION_NAME=$(cat "$SESSION_FILE")
+        # Verify the stored session is still alive
+        if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+            return 0
+        fi
+        # Stored session is dead, clean up
+        rm -f "$SESSION_FILE"
+    fi
+    SESSION_NAME=""
+    return 1
+}
+
+generate_session_name() {
+    local random_suffix
+    random_suffix=$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c 6)
+    SESSION_NAME="auto-dev-${random_suffix}"
+    mkdir -p .auto-dev
+    echo "$SESSION_NAME" > "$SESSION_FILE"
+}
 
 # Colors
 RED='\033[0;31m'
@@ -23,7 +46,7 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1" >&2; }
 
 # Check if tmux session exists
 session_exists() {
-    tmux has-session -t "$SESSION_NAME" 2>/dev/null
+    load_session_name && tmux has-session -t "$SESSION_NAME" 2>/dev/null
 }
 
 # Initialize Auto Dev tmux session with Command Center
@@ -34,7 +57,9 @@ ad_init() {
         return
     fi
 
-    log_info "Creating Auto Dev tmux session..."
+    # Generate a unique session name
+    generate_session_name
+    log_info "Creating Auto Dev tmux session: $SESSION_NAME"
 
     # Create session with window 0 as Command Center
     tmux new-session -d -s "$SESSION_NAME" -n "COMMAND-CENTER"
@@ -79,7 +104,7 @@ ad_new_window() {
     local session_id="$1"
     local instruction="$2"
 
-    if ! session_exists; then
+    if ! load_session_name; then
         log_error "Auto Dev tmux session not found. Run 'dashboard.sh ad_init' first."
         return 1
     fi
@@ -106,7 +131,7 @@ ad_new_window() {
 
 # List all windows (sessions)
 ad_list_windows() {
-    if ! session_exists; then
+    if ! load_session_name; then
         log_warn "Auto Dev tmux session not found."
         return 1
     fi
@@ -119,7 +144,7 @@ ad_list_windows() {
 # Switch to a specific window
 ad_switch_window() {
     local window="$1"
-    if ! session_exists; then
+    if ! load_session_name; then
         log_error "Auto Dev tmux session not found."
         return 1
     fi
@@ -129,7 +154,7 @@ ad_switch_window() {
 # Get window info
 ad_window_info() {
     local window="$1"
-    if ! session_exists; then
+    if ! load_session_name; then
         return 1
     fi
     tmux list-panes -t "$SESSION_NAME:$window" -F '#{pane_index}: #{pane_title} (#{pane_pid})'
@@ -138,7 +163,7 @@ ad_window_info() {
 # Kill a window
 ad_kill_window() {
     local window="$1"
-    if ! session_exists; then
+    if ! load_session_name; then
         return 1
     fi
 
@@ -154,8 +179,9 @@ ad_kill_window() {
 
 # Kill entire session
 ad_destroy() {
-    if session_exists; then
+    if load_session_name; then
         tmux kill-session -t "$SESSION_NAME"
+        rm -f "$SESSION_FILE"
         log_success "Auto Dev session destroyed"
     else
         log_warn "No Auto Dev session to destroy"
@@ -179,7 +205,7 @@ Commands:
   ad_destroy                 Destroy entire tmux session
 
 Environment:
-  SESSION_NAME: $SESSION_NAME
+  SESSION_FILE: $SESSION_FILE
   SESSIONS_DIR: $SESSIONS_DIR
 
 EOF

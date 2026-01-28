@@ -61,7 +61,7 @@ Phase: implementation
 Started: 2024-01-01 10:00:00
 Updated: 2024-01-01 10:45:30
 
-tmux Window: auto-dev:2
+tmux Window: auto-dev-x1y2z3:2
 
 Active Agents:
   - CEO (pane 0) - Monitoring implementation
@@ -89,7 +89,7 @@ Logs:
 
 Commands:
   View logs: /ad:logs a1b2c3d4 ceo
-  Switch to window: tmux select-window -t auto-dev:2
+  Switch to window: tmux select-window -t auto-dev-x1y2z3:2
 ```
 
 ## Implementation
@@ -103,6 +103,7 @@ echo "Auto Dev Sessions"
 echo "================="
 echo ""
 
+TMUX_SESSION=$(cat .auto-dev/tmux-session 2>/dev/null || echo "auto-dev")
 RUNNING=0
 PAUSED=0
 COMPLETED=0
@@ -141,7 +142,7 @@ for dir in .auto-dev/sessions/*/; do
       ACTIVE_AGENTS=0
       WINDOW=$(bash scripts/dashboard.sh ad_find_window "$SID" 2>/dev/null)
       if [[ -n "$WINDOW" ]]; then
-        ACTIVE_AGENTS=$(tmux list-panes -t "auto-dev:$WINDOW" 2>/dev/null | wc -l | tr -d ' ')
+        ACTIVE_AGENTS=$(tmux list-panes -t "$TMUX_SESSION:$WINDOW" 2>/dev/null | wc -l | tr -d ' ')
       fi
 
       # Get PR info
@@ -172,6 +173,7 @@ echo "Total: $((RUNNING + PAUSED + COMPLETED)) sessions ($RUNNING running, $PAUS
 ```bash
 SESSION_ID="$1"
 SESSION_DIR=".auto-dev/sessions/$SESSION_ID"
+TMUX_SESSION=$(cat .auto-dev/tmux-session 2>/dev/null || echo "auto-dev")
 
 if [[ ! -d "$SESSION_DIR" ]]; then
   echo "Session $SESSION_ID not found"
@@ -200,10 +202,10 @@ fi
 # tmux window
 WINDOW=$(bash scripts/dashboard.sh ad_find_window "$SESSION_ID" 2>/dev/null)
 if [[ -n "$WINDOW" ]]; then
-  echo "tmux Window: auto-dev:$WINDOW"
+  echo "tmux Window: $TMUX_SESSION:$WINDOW"
   echo ""
   echo "Active Agents:"
-  tmux list-panes -t "auto-dev:$WINDOW" -F '  - #{pane_title} (pane #{pane_index})' 2>/dev/null
+  tmux list-panes -t "$TMUX_SESSION:$WINDOW" -F '  - #{pane_title} (pane #{pane_index})' 2>/dev/null
 else
   echo "tmux Window: Not active"
 fi

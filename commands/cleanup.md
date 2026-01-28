@@ -91,8 +91,9 @@ cleanup_session() {
   # Kill tmux window
   local window=$(bash scripts/dashboard.sh ad_find_window "$sid" 2>/dev/null)
   if [[ -n "$window" && "$window" != "0" ]]; then
-    log_action "  Kill tmux window: auto-dev:$window"
-    [[ "$DRY_RUN" != "true" ]] && tmux kill-window -t "auto-dev:$window" 2>/dev/null
+    TMUX_SESSION=$(cat .auto-dev/tmux-session 2>/dev/null || echo "auto-dev")
+    log_action "  Kill tmux window: $TMUX_SESSION:$window"
+    [[ "$DRY_RUN" != "true" ]] && tmux kill-window -t "$TMUX_SESSION:$window" 2>/dev/null
   fi
 
   # Remove worktrees

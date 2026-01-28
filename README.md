@@ -86,7 +86,7 @@ cd your-project-directory
 bash path/to/claude-auto-dev-plugin/scripts/dashboard.sh ad_init
 ```
 
-A tmux session `auto-dev` will start and the Command Center (window 0) will open.
+A tmux session `auto-dev-<random>` will start and the Command Center (window 0) will open.
 
 ### 2. Give an Instruction
 
@@ -317,7 +317,8 @@ A working directory is created for each session:
 /ad:status
 
 # Switch to the relevant window and check CEO pane
-tmux select-window -t auto-dev:1
+# Session name is shown in /ad:status output
+tmux select-window -t <session-name>:1
 ```
 
 ### Missed an Escalation

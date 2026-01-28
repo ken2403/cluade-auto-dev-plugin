@@ -6,8 +6,19 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_DIR="$(dirname "$SCRIPT_DIR")"
-SESSION_NAME="auto-dev"
 SESSIONS_DIR=".auto-dev/sessions"
+SESSION_FILE=".auto-dev/tmux-session"
+
+# Load session name from file
+load_session_name() {
+    if [[ -f "$SESSION_FILE" ]]; then
+        SESSION_NAME=$(cat "$SESSION_FILE")
+        return 0
+    fi
+    SESSION_NAME=""
+    return 1
+}
+load_session_name || true
 WORKTREES_DIR="worktrees"
 
 # Colors

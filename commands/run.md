@@ -82,8 +82,9 @@ bash scripts/spinup.sh "$SESSION_ID" ceo \
   "Instruction from God: $INSTRUCTION. Working directory: .auto-dev/sessions/$SESSION_ID/"
 
 # Report to user
+TMUX_SESSION=$(cat .auto-dev/tmux-session)
 echo "Session $SESSION_ID started in tmux window $WINDOW_NUM"
-echo "Use: tmux select-window -t auto-dev:$WINDOW_NUM"
+echo "Use: tmux select-window -t $TMUX_SESSION:$WINDOW_NUM"
 ```
 
 #### Case B: Resume Session

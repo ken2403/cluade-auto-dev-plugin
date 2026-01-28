@@ -50,7 +50,7 @@ Watch pane auto-dev:1.3 for progress:
 {
   "timestamp": "2024-01-01T12:00:00Z",
   "type": "completion_detected",
-  "pane": "auto-dev:1.2",
+  "pane": "$TMUX_SESSION:1.2",
   "pane_title": "pm-1",
   "status": "success",
   "detected_pattern": "Report written to .auto-dev/sessions/abc123/blackboard/pm-1.json",
@@ -69,7 +69,7 @@ Watch pane auto-dev:1.3 for progress:
 {
   "timestamp": "2024-01-01T12:00:00Z",
   "type": "error_detected",
-  "pane": "auto-dev:1.3",
+  "pane": "$TMUX_SESSION:1.3",
   "pane_title": "dev-1",
   "status": "error",
   "detected_pattern": "Error: Cannot read file",
@@ -89,7 +89,7 @@ Watch pane auto-dev:1.3 for progress:
 {
   "timestamp": "2024-01-01T12:00:00Z",
   "type": "multi_pane_status",
-  "window": "auto-dev:1",
+  "window": "$TMUX_SESSION:1",
   "panes": [
     {
       "index": 0,
@@ -129,7 +129,7 @@ Watch pane auto-dev:1.3 for progress:
 {
   "timestamp": "2024-01-01T12:00:00Z",
   "type": "progress_report",
-  "pane": "auto-dev:1.5",
+  "pane": "$TMUX_SESSION:1.5",
   "pane_title": "builder-1",
   "progress": {
     "current_step": 3,
@@ -146,23 +146,26 @@ Watch pane auto-dev:1.3 for progress:
 
 ### Capture Pane Output
 ```bash
+# Load tmux session name
+TMUX_SESSION=$(cat .auto-dev/tmux-session 2>/dev/null || echo "auto-dev")
+
 # Get last 100 lines
-tmux capture-pane -t "auto-dev:1.2" -p -S -100
+tmux capture-pane -t "$TMUX_SESSION:1.2" -p -S -100
 
 # Get entire scrollback
-tmux capture-pane -t "auto-dev:1.2" -p -S -
+tmux capture-pane -t "$TMUX_SESSION:1.2" -p -S -
 
 # Get pane info
-tmux list-panes -t "auto-dev:1" -F '#{pane_index}|#{pane_title}|#{pane_pid}|#{pane_current_command}'
+tmux list-panes -t "$TMUX_SESSION:1" -F '#{pane_index}|#{pane_title}|#{pane_pid}|#{pane_current_command}'
 ```
 
 ### Check Pane Activity
 ```bash
 # Last activity time
-tmux display-message -t "auto-dev:1.2" -p '#{pane_last_activity}'
+tmux display-message -t "$TMUX_SESSION:1.2" -p '#{pane_last_activity}'
 
 # Current command
-tmux display-message -t "auto-dev:1.2" -p '#{pane_current_command}'
+tmux display-message -t "$TMUX_SESSION:1.2" -p '#{pane_current_command}'
 ```
 
 ## Detection Patterns
@@ -259,7 +262,7 @@ Any "critical" or "high severity" should alert immediately
 ### Pane Closed Mid-Watch
 ```json
 {
-  "pane": "auto-dev:1.5",
+  "pane": "$TMUX_SESSION:1.5",
   "status": "pane_closed",
   "last_known_state": "processing",
   "possible_causes": ["crash", "manual close", "tmux error"],
@@ -270,7 +273,7 @@ Any "critical" or "high severity" should alert immediately
 ### Output Flooded (Very Verbose)
 ```json
 {
-  "pane": "auto-dev:1.3",
+  "pane": "$TMUX_SESSION:1.3",
   "status": "output_flood",
   "lines_per_second": 500,
   "recommendation": "Agent may be in debug mode or loop",
@@ -281,7 +284,7 @@ Any "critical" or "high severity" should alert immediately
 ### Hung Process
 ```json
 {
-  "pane": "auto-dev:1.2",
+  "pane": "$TMUX_SESSION:1.2",
   "status": "possibly_hung",
   "no_output_seconds": 180,
   "process_running": true,

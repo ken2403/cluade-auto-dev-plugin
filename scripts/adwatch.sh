@@ -7,8 +7,18 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_DIR="$(dirname "$SCRIPT_DIR")"
-SESSION_NAME="auto-dev"
 SESSIONS_DIR=".auto-dev/sessions"
+SESSION_FILE=".auto-dev/tmux-session"
+
+# Load session name from file (re-reads each time for freshness)
+load_session_name() {
+    if [[ -f "$SESSION_FILE" ]]; then
+        SESSION_NAME=$(cat "$SESSION_FILE")
+        return 0
+    fi
+    SESSION_NAME=""
+    return 1
+}
 FALLBACK_INTERVAL=5  # Polling interval if fswatch not available
 
 # Colors
@@ -100,7 +110,7 @@ draw_dashboard() {
     echo ""
 
     # Check if tmux session exists
-    if ! tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+    if ! load_session_name || ! tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
         echo -e "${YELLOW}No Auto Dev session running.${NC}"
         echo "Run: bash scripts/dashboard.sh ad_init"
         return
