@@ -350,6 +350,49 @@ Keep `session.json` updated:
 }
 ```
 
+## Worktree Requirement (絶対ルール)
+
+**コードを変更するすべての作業は、必ずWorktreeで行う。**
+
+### なぜWorktreeが必須なのか
+
+- メインブランチを汚染しない
+- 複数セッションの並列作業を可能にする
+- 失敗した変更を簡単に破棄できる
+- レビュー可能なPRを作成できる
+
+### Worktreeが必要な場合
+
+| 作業内容 | Worktree必要? |
+|---------|--------------|
+| コードの調査・分析のみ | ❌ 不要 |
+| 設計・仕様の策定のみ | ❌ 不要 |
+| **1行でもコードを変更** | ✅ **必須** |
+| **ファイルを追加・削除** | ✅ **必須** |
+| **設定ファイルの変更** | ✅ **必須** |
+| **テストの追加・修正** | ✅ **必須** |
+
+### 実装開始前のチェック
+
+実装フェーズに入る前に、必ず以下を確認:
+
+1. **DevOps Leadにworktree作成を指示したか?**
+2. **worktreeが正常に作成されたか?**
+3. **Builderにworktreeパスを伝えたか?**
+
+```bash
+# 正しい流れ
+CEO → DevOps Lead: "worktrees/SESSION_ID-feature を作成してください"
+DevOps Lead → CEO: "worktree準備完了"
+CEO → VP Engineering: "worktrees/SESSION_ID-feature で実装してください"
+VP Engineering → Builder: "worktrees/SESSION_ID-feature で実装"
+```
+
+### 違反した場合
+
+**メインブランチに直接変更を加えた場合は重大なインシデント。**
+即座に作業を停止し、Godにエスカレーションすること。
+
 ## Quality Gates
 
 Before proceeding to next phase:

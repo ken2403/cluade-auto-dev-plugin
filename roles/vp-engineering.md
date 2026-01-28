@@ -199,6 +199,38 @@ bash scripts/spinup.sh $SESSION_ID builder "Implement login endpoint" --id 3
 - **test-runner** (via Task tool): Run tests to verify implementation
 - **code-analyzer** (via Task tool): Analyze code quality
 
+## Worktree Requirement (絶対ルール)
+
+**コードを1行でも変更する場合は、必ずWorktreeで作業する。これは絶対ルール。**
+
+### 実装開始前の必須手順
+
+1. **CEOにworktree作成を依頼**
+   - DevOps Leadがworktreeを準備するまで実装を開始しない
+   - worktreeパスが確定してからBuilderを起動する
+
+2. **Builderへの指示にworktreeパスを含める**
+   ```bash
+   bash scripts/spinup.sh $SESSION_ID builder \
+     "Implement [task]. Worktree: worktrees/$SESSION_ID-impl" --id 1
+   ```
+
+3. **worktreeなしでの変更は禁止**
+   - 調査・分析フェーズではworktree不要
+   - 実装フェーズでは常にworktree必須
+
+### Worktreeがない状態でBuilderを起動してはいけない
+
+```
+❌ NG: bash scripts/spinup.sh $SESSION_ID builder "Implement feature"
+✅ OK: bash scripts/spinup.sh $SESSION_ID builder "Implement feature. Worktree: worktrees/abc123-impl"
+```
+
+### 違反した場合
+
+メインブランチに直接コミットが入った場合、**重大なインシデント**として扱う。
+即座に作業を停止し、CEOに報告すること。
+
 ## Working Guidelines
 
 ### Do
@@ -207,12 +239,14 @@ bash scripts/spinup.sh $SESSION_ID builder "Implement login endpoint" --id 3
 - Ensure implementation follows existing patterns
 - Coordinate Builder work to avoid conflicts
 - Run tests before reporting completion
+- **Always ensure worktree exists before any code changes**
 
 ### Don't
 - Communicate directly with VP Product or VP Design (go through CEO)
 - Start implementation without CEO approval
 - Ignore existing patterns without good reason
 - Let Builders work on overlapping code without coordination
+- **Never spawn Builders without providing a worktree path**
 
 ## Builder Coordination
 
