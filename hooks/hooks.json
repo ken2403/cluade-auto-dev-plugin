@@ -1,0 +1,47 @@
+{
+  "description": "Auto Dev hooks for tmux and session management",
+  "hooks": [
+    {
+      "name": "session-start",
+      "description": "Initialize session directory structure when /ad:run creates a new session",
+      "event": "pre-command",
+      "command": "/ad:run",
+      "action": "mkdir -p .auto-dev/sessions"
+    },
+    {
+      "name": "tmux-retile",
+      "description": "Auto-retile panes when new pane is created in tmux",
+      "event": "tmux:after-split-window",
+      "action": "select-layout tiled"
+    },
+    {
+      "name": "tmux-retile-on-close",
+      "description": "Auto-retile panes when a pane is closed",
+      "event": "tmux:pane-exited",
+      "action": "select-layout tiled"
+    },
+    {
+      "name": "pane-logging",
+      "description": "Enable logging for new agent panes",
+      "event": "agent-spawn",
+      "notes": "Implemented in spinup.sh via tmux pipe-pane"
+    },
+    {
+      "name": "session-cleanup-reminder",
+      "description": "Remind about cleanup for completed sessions older than 3 days",
+      "event": "session-complete",
+      "notes": "CEO should notify God about completed sessions"
+    }
+  ],
+  "tmux_hooks": {
+    "description": "These hooks are set up by dashboard.sh when initializing the tmux session",
+    "after-split-window": "select-layout tiled",
+    "pane-exited": "select-layout tiled"
+  },
+  "notes": [
+    "Most hooks are implemented directly in scripts rather than as Claude Code hooks",
+    "tmux hooks are set via: tmux set-hook -t SESSION_NAME HOOK_NAME 'COMMAND'",
+    "Agent logging is set up via: tmux pipe-pane -t PANE -o 'cat >> LOG_PATH'",
+    "This file serves as documentation for the hook system"
+  ]
+}
