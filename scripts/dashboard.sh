@@ -26,10 +26,20 @@ load_session_name() {
 
 generate_session_name() {
     local random_suffix
-    random_suffix=$(LC_ALL=C tr -dc 'a-z0-9' < /dev/urandom | head -c 6)
+    random_suffix=$(openssl rand -hex 3)
     SESSION_NAME="auto-dev-${random_suffix}"
     mkdir -p .auto-dev
     echo "$SESSION_NAME" > "$SESSION_FILE"
+}
+
+# Add .auto-dev/ to .git/info/exclude if not already present
+ensure_git_exclude() {
+    local exclude_file=".git/info/exclude"
+    if [[ -d ".git" && -f "$exclude_file" ]]; then
+        if ! grep -qx '.auto-dev/' "$exclude_file" 2>/dev/null; then
+            echo '.auto-dev/' >> "$exclude_file"
+        fi
+    fi
 }
 
 # Colors
@@ -59,6 +69,7 @@ ad_init() {
 
     # Generate a unique session name
     generate_session_name
+    ensure_git_exclude
     log_info "Creating Auto Dev tmux session: $SESSION_NAME"
 
     # Create session with window 0 as Command Center
