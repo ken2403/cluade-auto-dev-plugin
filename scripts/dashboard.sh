@@ -79,6 +79,9 @@ ad_init() {
     # Generate a unique session name
     generate_session_name
     ensure_git_exclude
+
+    # Save plugin directory path so commands/roles can find scripts
+    echo "$PLUGIN_DIR" > .auto-dev/plugin-dir
     log_info "Creating Auto Dev tmux session: $SESSION_NAME"
 
     # Create session with window 0 as Command Center

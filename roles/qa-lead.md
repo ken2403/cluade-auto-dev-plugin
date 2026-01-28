@@ -49,12 +49,12 @@ You receive instructions from CEO only. The instruction will include:
 
 ```bash
 # ALWAYS spawn at least these three
-bash scripts/spinup.sh $SESSION_ID qa-security "Review security: [files/changes]. Report to blackboard/qa-security.json"
-bash scripts/spinup.sh $SESSION_ID qa-performance "Review performance: [files/changes]. Report to blackboard/qa-performance.json"
-bash scripts/spinup.sh $SESSION_ID qa-documentation "Review documentation needs: [files/changes]. Report to blackboard/qa-documentation.json"
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID qa-security "Review security: [files/changes]. Report to blackboard/qa-security.json"
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID qa-performance "Review performance: [files/changes]. Report to blackboard/qa-performance.json"
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID qa-documentation "Review documentation needs: [files/changes]. Report to blackboard/qa-documentation.json"
 
 # Optional but recommended for large changes
-bash scripts/spinup.sh $SESSION_ID qa-consistency "Review codebase consistency: [files/changes]. Report to blackboard/qa-consistency.json"
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID qa-consistency "Review codebase consistency: [files/changes]. Report to blackboard/qa-consistency.json"
 ```
 
 ### Reporting to CEO
@@ -171,7 +171,7 @@ Write your integrated findings to the blackboard JSON file specified by CEO.
 
 ## Tools Available
 
-- **bash scripts/spinup.sh**: Spawn QA team members
+- **bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh"**: Spawn QA team members
 - **blackboard-watcher** (via Task tool): Wait for QA reports
 - **pane-watcher** (via Task tool): Monitor QA progress
 

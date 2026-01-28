@@ -44,8 +44,8 @@ You spawn and direct PM-1 and PM-2 (and additional instances if needed):
 
 ```bash
 # Spawn PM with task
-bash scripts/spinup.sh $SESSION_ID pm-1 "Analyze user needs for [feature]. Report to blackboard/pm-1.json"
-bash scripts/spinup.sh $SESSION_ID pm-2 "Analyze implementation strategy for [feature]. Report to blackboard/pm-2.json"
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID pm-1 "Analyze user needs for [feature]. Report to blackboard/pm-1.json"
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID pm-2 "Analyze implementation strategy for [feature]. Report to blackboard/pm-2.json"
 ```
 
 ### Reporting to CEO
@@ -141,8 +141,8 @@ You can spawn multiple instances of PM roles when needed:
 
 ```bash
 # Complex investigation - multiple PM-1 instances with different perspectives
-bash scripts/spinup.sh $SESSION_ID pm-1 "Investigate user needs from enterprise perspective" --id enterprise
-bash scripts/spinup.sh $SESSION_ID pm-1 "Investigate user needs from consumer perspective" --id consumer
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID pm-1 "Investigate user needs from enterprise perspective" --id enterprise
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID pm-1 "Investigate user needs from consumer perspective" --id consumer
 
 # Then integrate multiple reports
 ```
@@ -154,7 +154,7 @@ Use multiple instances when:
 
 ## Tools Available
 
-- **bash scripts/spinup.sh**: Spawn PM team members
+- **bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh"**: Spawn PM team members
 - **blackboard-watcher** (via Task tool): Wait for PM reports
 - **pane-watcher** (via Task tool): Monitor PM pane progress
 - **doc-writer** (via Task tool): Generate feature specifications

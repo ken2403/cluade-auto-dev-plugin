@@ -140,7 +140,7 @@ for dir in .auto-dev/sessions/*/; do
 
       # Count active agents (tmux panes)
       ACTIVE_AGENTS=0
-      WINDOW=$(bash scripts/dashboard.sh ad_find_window "$SID" 2>/dev/null)
+      WINDOW=$(bash "$(cat .auto-dev/plugin-dir)/scripts/dashboard.sh" ad_find_window "$SID" 2>/dev/null)
       if [[ -n "$WINDOW" ]]; then
         ACTIVE_AGENTS=$(tmux list-panes -t "$TMUX_SESSION:$WINDOW" 2>/dev/null | wc -l | tr -d ' ')
       fi
@@ -200,7 +200,7 @@ if [[ -f "${SESSION_DIR}/session.json" ]]; then
 fi
 
 # tmux window
-WINDOW=$(bash scripts/dashboard.sh ad_find_window "$SESSION_ID" 2>/dev/null)
+WINDOW=$(bash "$(cat .auto-dev/plugin-dir)/scripts/dashboard.sh" ad_find_window "$SESSION_ID" 2>/dev/null)
 if [[ -n "$WINDOW" ]]; then
   echo "tmux Window: $TMUX_SESSION:$WINDOW"
   echo ""

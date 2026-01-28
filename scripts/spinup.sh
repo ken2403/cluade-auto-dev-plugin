@@ -181,15 +181,26 @@ main() {
     # Build claude command
     local claude_bin="${CLAUDE_BIN:-claude}"
 
-    # Escape task for shell
+    # Escape task for shell (single quotes)
     local escaped_task=$(printf '%s' "$task" | sed "s/'/'\\\\''/g")
 
-    # Build the full command
-    local cmd="$claude_bin --system-prompt '$role_file' -p '$escaped_task.
+    # Generate launcher script to properly load role file contents
+    # --system-prompt takes a STRING, not a file path.
+    # The launcher reads the role file at runtime and passes contents as system prompt.
+    local launcher="$log_dir/.launcher-${pane_name}.sh"
+    cat > "$launcher" << LAUNCHER_EOF
+#!/bin/bash
+ROLE_FILE="$role_file"
+ROLE_CONTENT=\$(cat "\$ROLE_FILE")
+exec $claude_bin --system-prompt "\$ROLE_CONTENT" -p '$escaped_task.
 Working directory: $SESSIONS_DIR/$session_id/
-Report to: $SESSIONS_DIR/$session_id/blackboard/${pane_name}.json'"
+Report to: $SESSIONS_DIR/$session_id/blackboard/${pane_name}.json'
+LAUNCHER_EOF
+    chmod +x "$launcher"
 
-    log_info "Spawning $pane_name in window $window..."
+    local cmd="bash '$launcher'"
+
+    log_info "Spawning $pane_name in window $window (role: $role_file)..."
 
     local new_pane
     if [[ "$initial" == "true" ]]; then

@@ -39,6 +39,14 @@ model: opus
 
 引数に指示テキストが渡された場合、以下のbashコマンドを**順番にそのまま実行**してください。
 
+### Step 0: プラグインディレクトリの取得
+
+```bash
+AD_PLUGIN_DIR=$(cat .auto-dev/plugin-dir)
+```
+
+この `$AD_PLUGIN_DIR` を以降のスクリプト呼び出しで使う。
+
 ### Step 1: セッションID生成とディレクトリ作成
 
 ```bash
@@ -72,7 +80,9 @@ EOF
 ### Step 4: タイトル生成（AI要約）
 
 ```bash
-TITLE=$(claude -p "You are a title generator. Output ONLY a short task title in 3-5 words. No quotes, no period, no explanation. Just the title. Instruction: $INSTRUCTION" 2>/dev/null | tail -1 || echo "")
+# Generate title and strip ANSI escape codes / whitespace
+RAW_TITLE=$(claude -p "You are a title generator. Output ONLY a short task title in 3-5 words. No quotes, no period, no explanation. Just the title. Instruction: $INSTRUCTION" 2>/dev/null || echo "")
+TITLE=$(echo "$RAW_TITLE" | sed 's/\x1b\[[0-9;]*m//g' | tr -d '\r' | sed '/^$/d' | tail -1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 if [[ -n "$TITLE" ]]; then
   echo "$TITLE" > .auto-dev/sessions/$SESSION_ID/title.txt
 fi
@@ -81,13 +91,13 @@ fi
 ### Step 5: tmux Windowの作成
 
 ```bash
-WINDOW_NUM=$(bash scripts/dashboard.sh ad_new_window "$SESSION_ID" "$INSTRUCTION")
+WINDOW_NUM=$(bash "$AD_PLUGIN_DIR/scripts/dashboard.sh" ad_new_window "$SESSION_ID" "$INSTRUCTION")
 ```
 
 ### Step 6: CEOの起動（新しいWindowのpane 0で実行）
 
 ```bash
-bash scripts/spinup.sh "$SESSION_ID" ceo \
+bash "$AD_PLUGIN_DIR/scripts/spinup.sh" "$SESSION_ID" ceo \
   "Instruction from God: $INSTRUCTION. Working directory: .auto-dev/sessions/$SESSION_ID/" \
   --initial
 ```
@@ -109,6 +119,8 @@ echo "Use: tmux select-window -t $TMUX_SESSION:$WINDOW_NUM"
 `--session ID` が指定された場合:
 
 ```bash
+AD_PLUGIN_DIR=$(cat .auto-dev/plugin-dir)
+
 if [[ ! -d ".auto-dev/sessions/$SESSION_ID" ]]; then
   echo "Session $SESSION_ID not found"
   exit 1
@@ -121,10 +133,10 @@ PHASE=$(echo $SESSION_JSON | jq -r '.phase')
 # Find or create tmux window
 WINDOW_NUM=$(tmux list-windows -t "$(cat .auto-dev/tmux-session)" -F '#{window_index}|#{window_name}' | grep "${SESSION_ID:0:20}" | head -1 | cut -d'|' -f1)
 if [[ -z "$WINDOW_NUM" ]]; then
-  WINDOW_NUM=$(bash scripts/dashboard.sh ad_new_window "$SESSION_ID" "$INSTRUCTION")
+  WINDOW_NUM=$(bash "$AD_PLUGIN_DIR/scripts/dashboard.sh" ad_new_window "$SESSION_ID" "$INSTRUCTION")
 fi
 
-bash scripts/spinup.sh "$SESSION_ID" ceo \
+bash "$AD_PLUGIN_DIR/scripts/spinup.sh" "$SESSION_ID" ceo \
   "Session resumed. Previous phase: $PHASE. Working directory: .auto-dev/sessions/$SESSION_ID/. Check session.json and blackboard/ to continue." \
   --initial
 

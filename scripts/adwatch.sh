@@ -61,14 +61,14 @@ get_active_agents() {
     fi
 }
 
-# Get instruction summary (prefer AI-generated title)
-get_instruction() {
+# Get session title (prefer AI-generated title.txt, fallback to instruction.txt)
+get_title() {
     local session_id="$1"
     local title_file="$SESSIONS_DIR/$session_id/title.txt"
     local inst_file="$SESSIONS_DIR/$session_id/instruction.txt"
 
-    if [[ -f "$title_file" ]]; then
-        head -c 40 "$title_file" | tr '\n' ' '
+    if [[ -f "$title_file" && -s "$title_file" ]]; then
+        head -c 40 "$title_file" | tr '\n\r' '  ' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/\x1b\[[0-9;]*m//g'
     elif [[ -f "$inst_file" ]]; then
         head -c 40 "$inst_file" | tr '\n' ' '
     else
@@ -134,7 +134,7 @@ draw_dashboard() {
     echo ""
     echo -e "${BOLD}SESSIONS:${NC}"
     echo -e "${DIM}─────────────────────────────────────────────────────────────────────${NC}"
-    printf "  ${DIM}%-15s %-12s %-8s %-6s %-30s${NC}\n" "SESSION_ID" "STATUS" "AGENTS" "ESC" "INSTRUCTION"
+    printf "  ${DIM}%-15s %-12s %-8s %-6s %-30s${NC}\n" "SESSION_ID" "STATUS" "AGENTS" "ESC" "TITLE"
     echo -e "${DIM}  ─────────────── ──────────── ──────── ────── ──────────────────────────────${NC}"
 
     # List sessions from filesystem
@@ -147,7 +147,7 @@ draw_dashboard() {
                 local status=$(get_session_status "$session_id")
                 local agents=$(get_active_agents "$session_id")
                 local pending_esc=$(get_pending_escalations "$session_id")
-                local inst=$(get_instruction "$session_id")
+                local inst=$(get_title "$session_id")
 
                 # Color status
                 local status_color=""

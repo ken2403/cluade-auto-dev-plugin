@@ -44,8 +44,8 @@ You spawn and direct UX and IA:
 
 ```bash
 # Spawn design team with tasks
-bash scripts/spinup.sh $SESSION_ID ux "Design user experience for [feature]. Report to blackboard/ux.json"
-bash scripts/spinup.sh $SESSION_ID ia "Design information architecture for [feature]. Report to blackboard/ia.json"
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID ux "Design user experience for [feature]. Report to blackboard/ux.json"
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID ia "Design information architecture for [feature]. Report to blackboard/ia.json"
 ```
 
 ### Reporting to CEO
@@ -154,8 +154,8 @@ You can spawn multiple instances when needed:
 
 ```bash
 # Complex feature - multiple perspectives
-bash scripts/spinup.sh $SESSION_ID ux "Design mobile experience for [feature]" --id mobile
-bash scripts/spinup.sh $SESSION_ID ux "Design desktop experience for [feature]" --id desktop
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID ux "Design mobile experience for [feature]" --id mobile
+bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh" $SESSION_ID ux "Design desktop experience for [feature]" --id desktop
 ```
 
 Use multiple instances when:
@@ -165,7 +165,7 @@ Use multiple instances when:
 
 ## Tools Available
 
-- **bash scripts/spinup.sh**: Spawn design team members
+- **bash "$(cat .auto-dev/plugin-dir)/scripts/spinup.sh"**: Spawn design team members
 - **blackboard-watcher** (via Task tool): Wait for team reports
 - **pane-watcher** (via Task tool): Monitor team pane progress
 - **codebase-explorer** (via Task tool): Understand existing design patterns
