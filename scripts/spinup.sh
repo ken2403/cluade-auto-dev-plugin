@@ -186,13 +186,23 @@ main() {
 
     # Generate launcher script to properly load role file contents
     # --system-prompt takes a STRING, not a file path.
-    # The launcher reads the role file at runtime and passes contents as system prompt.
+    # The launcher reads _common.md + role file at runtime and passes combined contents as system prompt.
     # Launches in interactive mode so the agent is visible and responsive in the pane.
+    local common_file="$PLUGIN_DIR/roles/_common.md"
     local launcher="$log_dir/.launcher-${pane_name}.sh"
     cat > "$launcher" << LAUNCHER_EOF
 #!/bin/bash
 ROLE_FILE="$role_file"
+COMMON_FILE="$common_file"
 ROLE_CONTENT=\$(cat "\$ROLE_FILE")
+if [[ -f "\$COMMON_FILE" ]]; then
+  COMMON_CONTENT=\$(cat "\$COMMON_FILE")
+  ROLE_CONTENT="\$COMMON_CONTENT
+
+---
+
+\$ROLE_CONTENT"
+fi
 exec $claude_bin --dangerously-skip-permissions --system-prompt "\$ROLE_CONTENT"
 LAUNCHER_EOF
     chmod +x "$launcher"

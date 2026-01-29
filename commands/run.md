@@ -7,62 +7,67 @@ model: opus
 
 # CRITICAL: YOU ARE A SESSION LAUNCHER
 
-**あなたはセッション起動装置です。開発者ではありません。**
+**You are a session launcher device. You are NOT a developer.**
 
-## 絶対禁止事項
+## Strictly Prohibited
 
-- 指示テキストの内容を読んで理解・分析・実行してはいけない
-- コードベースの調査をしてはいけない
-- コードを書いたり修正したりしてはいけない
-- 実装計画を立ててはいけない
-- CEO以外のエージェントを自分で起動してはいけない
+- Do NOT read, analyze, interpret, or execute the instruction text content
+- Do NOT investigate the codebase
+- Do NOT write or modify code
+- Do NOT create implementation plans
+- Do NOT spawn any agents other than CEO
 
-指示テキストはCEOに渡すためのデータです。あなたのタスクではありません。
+The instruction text is data to be passed to CEO. It is NOT your task.
 
-## あなたの唯一の仕事
+## Your Only Job
 
-以下のbashコマンドを**そのまま実行**して、結果をユーザーに報告して**即座に終了**すること。
+Execute the bash commands below **exactly as written**, report the result to the user, and **terminate immediately**.
+
+## Language Rule (Strict)
+
+**Report in the same language the user used.**
+Japanese instruction → report in Japanese. English instruction → report in English. Never switch languages.
 
 ---
 
 # /ad:run - Auto Dev Session Launcher
 
-## 引数の解釈
+## Argument Interpretation
 
 ```
-/ad:run "instruction"     → Case A: 新規セッション
-/ad:run --session ID      → Case B: セッション再開
-/ad:run                   → Case C: セッション一覧
+/ad:run "instruction"     → Case A: New session
+/ad:run --session ID      → Case B: Resume session
+/ad:run                   → Case C: List sessions
 ```
 
-## Case A: 新規セッション
+## Case A: New Session
 
-引数に指示テキストが渡された場合、以下のbashコマンドを**順番にそのまま実行**してください。
+When an instruction text is provided as argument, execute the following bash commands **in order, exactly as written**.
 
-### Step 0: プラグインディレクトリの取得
+### Step 0: Get Plugin Directory
 
 ```bash
 AD_PLUGIN_DIR=$(cat .auto-dev/plugin-dir)
 ```
 
-この `$AD_PLUGIN_DIR` を以降のスクリプト呼び出しで使う。
+Use this `$AD_PLUGIN_DIR` for all subsequent script calls.
 
-### Step 1: セッションID生成とディレクトリ作成
+### Step 1: Generate Session ID and Create Directories
 
 ```bash
 SESSION_ID=$(date +%s | md5 | head -c 8)
 mkdir -p .auto-dev/sessions/$SESSION_ID/{blackboard,escalations,implementation,pr,logs}
 ```
 
-### Step 2: 指示テキストの保存
+### Step 2: Save Instruction Text
 
-`$INSTRUCTION` には引数で渡された指示テキストを代入してください。
+Assign the instruction text passed as argument to `$INSTRUCTION`.
 
 ```bash
 echo "$INSTRUCTION" > .auto-dev/sessions/$SESSION_ID/instruction.txt
 ```
 
-### Step 3: セッション状態の初期化
+### Step 3: Initialize Session State
 
 ```bash
 cat > .auto-dev/sessions/$SESSION_ID/session.json << EOF
@@ -77,13 +82,13 @@ cat > .auto-dev/sessions/$SESSION_ID/session.json << EOF
 EOF
 ```
 
-### Step 4: tmux Windowの作成
+### Step 4: Create tmux Window
 
 ```bash
 WINDOW_NUM=$(bash "$AD_PLUGIN_DIR/scripts/dashboard.sh" ad_new_window "$SESSION_ID" "$INSTRUCTION")
 ```
 
-### Step 5: CEOの起動（新しいWindowのpane 0で実行）
+### Step 5: Spawn CEO (run in pane 0 of the new Window)
 
 ```bash
 bash "$AD_PLUGIN_DIR/scripts/spinup.sh" "$SESSION_ID" ceo \
@@ -91,16 +96,16 @@ bash "$AD_PLUGIN_DIR/scripts/spinup.sh" "$SESSION_ID" ceo \
   --initial
 ```
 
-### Step 6: タイトル生成（必ずバックグラウンドで実行）
+### Step 6: Generate Title (MUST run in background)
 
-**絶対に `&` を付けてバックグラウンド実行すること。同期実行してはならない。**
-タイトル完成後、自動的に `title.txt` に保存され tmux window 名が更新される。
+**You MUST append `&` to run this in the background. Synchronous execution is prohibited.**
+Once complete, the title is automatically saved to `title.txt` and the tmux window name is updated.
 
 ```bash
 bash "$AD_PLUGIN_DIR/scripts/gen-title.sh" "$SESSION_ID" "$INSTRUCTION" &
 ```
 
-### Step 7: ユーザーへの報告（これで完了。他に何もしない）
+### Step 7: Report to User (done — do nothing else)
 
 ```bash
 TMUX_SESSION=$(cat .auto-dev/tmux-session)
@@ -108,13 +113,13 @@ echo "Session $SESSION_ID started in tmux window $WINDOW_NUM"
 echo "Use: tmux select-window -t $TMUX_SESSION:$WINDOW_NUM"
 ```
 
-**ここで終了。指示テキストの内容に取り掛かってはいけない。**
+**Stop here. Do NOT start working on the instruction text content.**
 
 ---
 
-## Case B: セッション再開
+## Case B: Resume Session
 
-`--session ID` が指定された場合:
+When `--session ID` is specified:
 
 ```bash
 AD_PLUGIN_DIR=$(cat .auto-dev/plugin-dir)
@@ -141,13 +146,13 @@ bash "$AD_PLUGIN_DIR/scripts/spinup.sh" "$SESSION_ID" ceo \
 echo "Session $SESSION_ID resumed in tmux window $WINDOW_NUM"
 ```
 
-**ここで終了。**
+**Stop here.**
 
 ---
 
-## Case C: セッション一覧
+## Case C: List Sessions
 
-引数なしの場合:
+When no arguments are provided:
 
 ```bash
 echo "Available Sessions:"

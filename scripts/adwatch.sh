@@ -48,17 +48,27 @@ get_session_status() {
     fi
 }
 
-# Get active agents from blackboard
+# Get active agents by counting actual tmux panes for this session's window
 get_active_agents() {
     local session_id="$1"
-    local blackboard_dir="$SESSIONS_DIR/$session_id/blackboard"
+    local short_id="${session_id:0:20}"
 
-    if [[ -d "$blackboard_dir" ]]; then
-        local count=$(find "$blackboard_dir" -name "*.json" -mmin -5 2>/dev/null | wc -l | tr -d ' ')
-        echo "$count"
-    else
+    if [[ -z "$SESSION_NAME" ]] || ! tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
         echo "0"
+        return
     fi
+
+    # Find the window matching this session_id and count its panes
+    local pane_count
+    pane_count=$(tmux list-windows -t "$SESSION_NAME" -F '#{window_name}|#{window_panes}' 2>/dev/null | \
+        while IFS='|' read -r name panes; do
+            if [[ "$name" == "$short_id"* ]]; then
+                echo "$panes"
+                break
+            fi
+        done)
+
+    echo "${pane_count:-0}"
 }
 
 # Get session title (prefer AI-generated title.txt, fallback to instruction.txt)
